@@ -1,0 +1,21 @@
+{
+    "analyze-endpoints::field_added": "додано поля: :fields",
+    "analyze-endpoints::field_removed": "видалено поля: :fields",
+    "analyze-endpoints::field_changed": "змінився формат",
+    "analyze-endpoints::field_new": "новий",
+    "analyze-endpoints::no_changes": "без змін",
+    "analyze-endpoints::no_changes_detected": "✅ Змін не виявлено. Усі кінцеві точки актуальні ✨",
+    "analyze-endpoints::changes_detected": "🔁 Виявлено зміни в кінцевих точках:",
+    "analyze-endpoints::column_method": "Метод",
+    "analyze-endpoints::column_uri": "URI",
+    "analyze-endpoints::column_type": "Тип",
+    "analyze-endpoints::column_status": "Статус",
+    "analyze-endpoints::column_class": "Клас/Ресурс",
+    "generate-instruction::git_failed": "❌ Не вдалося отримати git diff",
+    "generate-instruction::start": "Генерація інструкцій..",
+    "generate-instruction::no_instruction": "- [ ] Нема нічого 🎉",
+    "generate-instruction::instructions_header": "🚀 Інструкції",
+    "generate-instruction::command": "- [ ] Команди:",
+    "generate-instruction::migrate": "- [ ] Міграції: php artisan migrate",
+    "generate-instruction::seeder": "- [ ] Сидери:"
+}

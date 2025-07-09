@@ -1,0 +1,20 @@
+{
+    "analyze-endpoints::field_added": "hinzugefügte Felder: :fields",
+    "analyze-endpoints::field_removed": "entfernte Felder: :fields",
+    "analyze-endpoints::field_changed": "Format geändert",
+    "analyze-endpoints::field_new": "neu",
+    "analyze-endpoints::no_changes": "keine Änderungen",
+    "analyze-endpoints::no_changes_detected": "✅ Keine Änderungen erkannt. Alle Endpunkte sind aktuell ✨",
+    "analyze-endpoints::changes_detected": "🔁 Änderungen an Endpunkten erkannt:",
+    "analyze-endpoints::column_method": "Methode",
+    "analyze-endpoints::column_uri": "URI",
+    "analyze-endpoints::column_type": "Typ",
+    "analyze-endpoints::column_status": "Status",
+    "analyze-endpoints::column_class": "Klasse/Ressource",
+    "generate-instruction::git_failed": "❌ Git-Diff konnte nicht abgerufen werden",
+    "generate-instruction::start": "Generierung der Anweisungen...",
+    "generate-instruction::no_instruction": "- [ ] Nichts zu tun 🎉",
+    "generate-instruction::instructions_header": "🚀 Anweisungen",
+    "generate-instruction::command": "- [ ] Befehle:",
+    "generate-instruction::seeder": "- [ ] Seeder:"
+}

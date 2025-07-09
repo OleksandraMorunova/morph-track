@@ -1,0 +1,46 @@
+{
+  "name": "om/morph-track",
+  "description": "Track and document changes in Laravel API endpoints, migrations, seeders, and Artisan commands. Automatically generate structured, readable change instructions",
+  "keywords": [
+    "laravel",
+    "api",
+    "endpoints",
+    "migrations",
+    "seeders",
+    "artisan",
+    "changelog",
+    "laravel package",
+    "code changes",
+    "diff tool",
+    "developer tools"
+  ],
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Oleksandra Morunova",
+      "email": "oleksandramorunova@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=8.0",
+    "laravel/framework": ">=9.0",
+    "laravel/pint": "^1.23"
+  },
+  "autoload": {
+    "psr-4": {
+      "OM\\MorphTrack\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "OM\\MorphTrack\\AnalyzeEndpointServiceProvider"
+      ],
+      "aliases": {
+        "MarkdownTranslator": "OM\\MorphTrack\\JIraTranslator\\Facades\\MarkdownTranslator"
+      }
+    }
+  },
+  "version": "1.0.0"
+}

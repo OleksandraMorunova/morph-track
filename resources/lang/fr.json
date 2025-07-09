@@ -1,0 +1,21 @@
+{
+  "analyze-endpoints::field_added": "champs ajoutés : :fields",
+  "analyze-endpoints::field_removed": "champs supprimés : :fields",
+  "analyze-endpoints::field_changed": "format modifié",
+  "analyze-endpoints::field_new": "nouveau",
+  "analyze-endpoints::no_changes": "aucun changement",
+  "analyze-endpoints::no_changes_detected": "✅ Aucun changement détecté. Tous les endpoints sont à jour ✨",
+  "analyze-endpoints::changes_detected": "🔁 Des changements d'endpoints détectés :",
+  "analyze-endpoints::column_method": "Méthode",
+  "analyze-endpoints::column_uri": "URI",
+  "analyze-endpoints::column_type": "Type",
+  "analyze-endpoints::column_status": "Statut",
+  "analyze-endpoints::column_class": "Classe/Ressource",
+  "generate-instruction::git_failed": "❌ Impossible d'obtenir le git diff",
+  "generate-instruction::start": "Génération des instructions...",
+  "generate-instruction::no_instruction": "- [ ] Rien à faire 🎉",
+  "generate-instruction::instructions_header": "🚀 Instructions",
+  "generate-instruction::command": "- [ ] Commandes:",
+  "generate-instruction::migrate": "- [ ] Migrations: php artisan migrate",
+  "generate-instruction::seeder": "- [ ] Seeders:"
+}
