@@ -1,0 +1,21 @@
+{
+    "analyze-endpoints::field_added": "campos añadidos: :fields",
+    "analyze-endpoints::field_removed": "campos eliminados: :fields",
+    "analyze-endpoints::field_changed": "formato cambiado",
+    "analyze-endpoints::field_new": "nuevo",
+    "analyze-endpoints::no_changes": "sin cambios",
+    "analyze-endpoints::no_changes_detected": "✅ No se detectaron cambios. Todos los endpoints están actualizados ✨",
+    "analyze-endpoints::changes_detected": "🔁 Se detectaron cambios en los endpoints:",
+    "analyze-endpoints::column_method": "Método",
+    "analyze-endpoints::column_uri": "URI",
+    "analyze-endpoints::column_type": "Tipo",
+    "analyze-endpoints::column_status": "Estado",
+    "analyze-endpoints::column_class": "Clase/Recurso",
+    "generate-instruction::git_failed": "❌ No se pudo obtener el git diff",
+    "generate-instruction::start": "Generando instrucciones...",
+    "generate-instruction::no_instruction": "- [ ] Nada que hacer 🎉",
+    "generate-instruction::instructions_header": "🚀 Instrucciones",
+    "generate-instruction::command": "- [ ] Comandos:",
+    "generate-instruction::migrate": "- [ ] Migraciones: php artisan migrate",
+    "generate-instruction::seeder": "- [ ] Seeders:"
+}
