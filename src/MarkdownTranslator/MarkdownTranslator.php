@@ -3,6 +3,7 @@
 namespace OM\MorphTrack\MarkdownTranslator;
 
 use Illuminate\Translation\Translator;
+use OM\MorphTrack\MarkdownSupport;
 
 class MarkdownTranslator
 {
@@ -12,14 +13,28 @@ class MarkdownTranslator
         protected bool $markdownFormatted = false,
     ) {}
 
-    public function translate($key = null, $replace = [], $locale = null, string $prefix = ''): ?string
+    public function translate($key = null, $replace = [], $locale = null, string $markdown = ''): ?string
     {
-        $prefix = $this->markdownFormatted ? $prefix : '';
-
         if (is_null($key)) {
             return $key;
         }
 
-        return $prefix.trans($key, $replace, $locale);
+        $trans = trans($key, $replace, $locale);
+        return $this->format($markdown, $trans);
+    }
+
+    public function format(string $markdown, string $trans): string
+    {
+        $markdown = $this->markdownFormatted ? $markdown : '';
+
+        if(in_array($markdown, [MarkdownSupport::HEADING_H1, MarkdownSupport::HEADING_H2, MarkdownSupport::HEADING_H3])) {
+            return "$markdown $trans";
+        }
+
+        if(in_array($markdown, [MarkdownSupport::BOLD, MarkdownSupport::ITALIC, MarkdownSupport::CODE])) {
+            return "$markdown $trans $markdown";
+        }
+
+        return "$trans";
     }
 }

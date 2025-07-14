@@ -4,6 +4,7 @@ namespace OM\MorphTrack\Instructions\Services\Groups;
 
 use OM\MorphTrack\GlobalConfig;
 use OM\MorphTrack\Instructions\Core\AbstractInstructionGroup;
+use OM\MorphTrack\MarkdownSupport;
 
 class MigrationGroup extends AbstractInstructionGroup
 {
@@ -18,6 +19,16 @@ class MigrationGroup extends AbstractInstructionGroup
             return [];
         }
 
-        return [__(key: 'generate-instruction::migrate', locale: $config->localization)];
+        $instruction = __(
+            key: 'generate-instruction::migrate',
+            locale: $config->localization
+        );
+
+        $command = __f(
+            markdown: MarkdownSupport::CODE,
+            text: 'php artisan migrate'
+        );
+
+        return ["$instruction $command"];
     }
 }

@@ -16,5 +16,6 @@
     "generate-instruction::no_instruction": "- [ ] Nichts zu tun 🎉",
     "generate-instruction::instructions_header": "🚀 Anweisungen",
     "generate-instruction::command": "- [ ] Befehle:",
+    "generate-instruction::migrate": "- [ ] Migrationen:",
     "generate-instruction::seeder": "- [ ] Seeder:"
 }

@@ -16,6 +16,6 @@
     "generate-instruction::no_instruction": "- [ ] Nothing to do 🎉",
     "generate-instruction::instructions_header": "🚀 Instructions",
     "generate-instruction::command": "- [ ] Commands:",
-    "generate-instruction::migrate": "- [ ] Migrations: php artisan migrate",
+    "generate-instruction::migrate": "- [ ] Migrations:",
     "generate-instruction::seeder": "- [ ] Seeders:"
 }
