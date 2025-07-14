@@ -22,7 +22,7 @@ class SeederGroup extends AbstractInstructionGroup
         $lines = [__(key: 'generate-instruction::seeder', locale: $config->localization)];
         foreach ($this->files as $file) {
             $class = pathinfo($file, PATHINFO_FILENAME);
-            $lines[] = '  - '. __f(markdown: MarkdownSupport::CODE, text:"php artisan db:seed --class=$class");
+            $lines[] = '  - '.__f(markdown: MarkdownSupport::CODE, text: "php artisan db:seed --class=$class");
         }
 
         return $lines;
