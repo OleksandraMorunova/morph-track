@@ -3,6 +3,7 @@
 namespace OM\MorphTrack\Instructions\Services;
 
 use OM\MorphTrack\GlobalConfig;
+use OM\MorphTrack\MarkdownSupport;
 use Symfony\Component\Process\Process;
 
 class GenerateInstructionService
@@ -38,7 +39,7 @@ class GenerateInstructionService
             }
         }
 
-        $instructions = [__m(key: 'generate-instruction::instructions_header', locale: $this->config->localization, prefix: '##')];
+        $instructions = [__m(key: 'generate-instruction::instructions_header', locale: $this->config->localization, markdown: MarkdownSupport::HEADING_H2)];
 
         foreach ($groups as $group) {
             $instructions = array_merge($instructions, $group->toLines($this->config));

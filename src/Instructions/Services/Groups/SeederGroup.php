@@ -4,6 +4,7 @@ namespace OM\MorphTrack\Instructions\Services\Groups;
 
 use OM\MorphTrack\GlobalConfig;
 use OM\MorphTrack\Instructions\Core\AbstractInstructionGroup;
+use OM\MorphTrack\MarkdownSupport;
 
 class SeederGroup extends AbstractInstructionGroup
 {
@@ -21,8 +22,7 @@ class SeederGroup extends AbstractInstructionGroup
         $lines = [__(key: 'generate-instruction::seeder', locale: $config->localization)];
         foreach ($this->files as $file) {
             $class = pathinfo($file, PATHINFO_FILENAME);
-            $markdown = $config->markdownFormatted ? '`' : '';
-            $lines[] = "  - {$markdown}php artisan db:seed --class=$class$markdown";
+            $lines[] = '  - '. __f(markdown: MarkdownSupport::CODE, text:"php artisan db:seed --class=$class");
         }
 
         return $lines;

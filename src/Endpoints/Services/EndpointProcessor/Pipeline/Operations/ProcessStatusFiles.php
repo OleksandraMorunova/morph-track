@@ -8,6 +8,7 @@ use OM\MorphTrack\Endpoints\Contracts\PipelineStepContract;
 use OM\MorphTrack\Endpoints\Dto\Parameters\EndpointParameters;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\EndpointProcessorHelper;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\EndpointPipelineContext;
+use OM\MorphTrack\MarkdownSupport;
 use Symfony\Component\Process\Process;
 
 class ProcessStatusFiles implements PipelineStepContract
@@ -79,7 +80,7 @@ class ProcessStatusFiles implements PipelineStepContract
         ] = $this->extractKeysFromDiff($pattern, $process->getOutput());
 
         $format = fn (string $action, array $fields) => $fields ?
-           __(key: "analyze-endpoints::$action", replace: ['fields' => implode(',', $fields)], locale: $this->localization) :
+           __m(key: "analyze-endpoints::$action", replace: ['fields' => implode(',', $fields)], locale: $this->localization) :
             null;
 
         $messages = array_filter([
@@ -105,9 +106,9 @@ class ProcessStatusFiles implements PipelineStepContract
 
             if (preg_match($pattern, $line, $m)) {
                 if ($isAdded) {
-                    $addedKeys[] = $m[1];
+                    $addedKeys[] = __f(markdown: MarkdownSupport::CODE, text: $m[1]);
                 } else {
-                    $removedKeys[] = $m[1];
+                    $removedKeys[] = __f(markdown: MarkdownSupport::CODE, text: $m[1]);
                 }
             }
         }

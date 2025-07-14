@@ -3,6 +3,7 @@
 namespace OM\MorphTrack\Endpoints\Services\EndpointAnalyzer;
 
 use OM\MorphTrack\Endpoints\Dto\Configuration\EndpointsConfig;
+use OM\MorphTrack\MarkdownSupport;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class EndpointAnalyzerService
@@ -20,7 +21,7 @@ class EndpointAnalyzerService
             return;
         }
 
-        $this->output->writeln(__m(key: 'analyze-endpoints::changes_detected', locale: $this->config->globalConfig->localization, prefix: '##'));
+        $this->output->writeln(__m(key: 'analyze-endpoints::changes_detected', locale: $this->config->globalConfig->localization, markdown: MarkdownSupport::HEADING_H2));
         $this->output->writeln($lines);
     }
 

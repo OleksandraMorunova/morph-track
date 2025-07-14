@@ -4,6 +4,7 @@ namespace OM\MorphTrack\Instructions\Services\Groups;
 
 use OM\MorphTrack\GlobalConfig;
 use OM\MorphTrack\Instructions\Core\AbstractInstructionGroup;
+use OM\MorphTrack\MarkdownSupport;
 
 class CommandGroup extends AbstractInstructionGroup
 {
@@ -28,9 +29,7 @@ class CommandGroup extends AbstractInstructionGroup
             $contents = file_get_contents($fullPath);
             preg_match("/signature\s*=\s*[\"']([^\"']+)[\"']/", $contents, $matches);
             if (! empty($matches[1])) {
-                $markdown = $config->markdownFormatted ? '`' : '';
-
-                $lines[] = "  - {$markdown}php artisan $matches[1]$markdown";
+                $lines[] = '  - ' . __f(markdown: MarkdownSupport::CODE, text: "php artisan $matches[1]");
             }
         }
 
