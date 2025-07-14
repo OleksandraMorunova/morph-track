@@ -36,13 +36,20 @@ jobs:
       - run: composer install --no-progress --prefer-dist --no-dev
       - run: composer require laravel/pint --no-progress --no-scripts
       - run: vendor/bin/pint --verbose
+
+      - name: Check pint changes
+        run: |
+          git status
+          git diff
+
       - name: Commit and push style fixes
         run: |
           git config --global user.name "pint[bot]"
           git config --global user.email "pint@github-actions"
-          git add .
-          git diff --cached --quiet || git commit -m "style: auto-fix with Pint"
-          git push origin stage
+          git add -A
+          git diff --cached --quiet && echo "✅ no commit" || \
+          (git commit -m "style: auto-fix with Pint" && git push origin stage)
+
       - run: composer remove laravel/pint --no-progress --no-scripts
 
   auto-merge:
