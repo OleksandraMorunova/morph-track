@@ -13,7 +13,7 @@ class CollectModifiedFiles implements PipelineStepContract
 {
     protected array $allowedRoots = [
         'app/Http/Requests',
-        'app/Http/Resources'
+        'app/Http/Resources',
     ];
 
     public function handle(EndpointPipelineContext $context, Closure $next): EndpointPipelineContext
@@ -42,17 +42,18 @@ class CollectModifiedFiles implements PipelineStepContract
         $changeFiles = [];
         foreach ($allRequestFiles as $file) {
 
-            if (!$this->isAllowed($file)) {
+            if (! $this->isAllowed($file)) {
                 continue;
             }
 
             $info = $this->classInfoResolver($file);
-            if (!$info) {
+            if (! $info) {
                 continue;
             }
 
             $this->find($file, $info, $changeFiles);
         }
+
         return $changeFiles;
     }
 
@@ -63,12 +64,12 @@ class CollectModifiedFiles implements PipelineStepContract
         preg_match('/namespace\s+(.+);/', $code, $namespaceMatch);
         preg_match('/(?:class|enum|interface|trait)\s+(\w+)/', $code, $nameMatch);
 
-        if (!isset($nameMatch[1])) {
+        if (! isset($nameMatch[1])) {
             return null;
         }
 
         return [
-            'fqcn' => ($namespaceMatch[1] ?? '') . '\\' . $nameMatch[1],
+            'fqcn' => ($namespaceMatch[1] ?? '').'\\'.$nameMatch[1],
             'className' => $nameMatch[1],
         ];
     }
@@ -76,18 +77,19 @@ class CollectModifiedFiles implements PipelineStepContract
     protected function isClassUsed(string $fileContent, string $fqcn, string $className): bool
     {
         $patterns = [
-            '/new\s+' . preg_quote($className) . '\b/',
-            '/instanceof\s+' . preg_quote($className) . '\b/',
-            '/\b' . preg_quote($className) . '::/',
-            '/extends\s+' . preg_quote($className) . '\b/',
-            '/use\s+' . preg_quote($fqcn) . '\s*;/',
-            '/[^a-zA-Z0-9_]' . preg_quote($className) . '[^a-zA-Z0-9_]/',
+            '/new\s+'.preg_quote($className).'\b/',
+            '/instanceof\s+'.preg_quote($className).'\b/',
+            '/\b'.preg_quote($className).'::/',
+            '/extends\s+'.preg_quote($className).'\b/',
+            '/use\s+'.preg_quote($fqcn).'\s*;/',
+            '/[^a-zA-Z0-9_]'.preg_quote($className).'[^a-zA-Z0-9_]/',
         ];
 
         foreach ($patterns as $pattern) {
-            if (!preg_match($pattern, $fileContent)) {
+            if (! preg_match($pattern, $fileContent)) {
                 return false;
             }
+
             return true;
         }
     }
@@ -95,8 +97,9 @@ class CollectModifiedFiles implements PipelineStepContract
     public function isAllowed(string $path): bool
     {
         $realPath = realpath($path);
+
         return collect($this->allowedRoots)
-            ->some(fn($root) => str_starts_with($realPath, realpath($root)));
+            ->some(fn ($root) => str_starts_with($realPath, realpath($root)));
     }
 
     public function find(string $pathToClassFile, array $info, array &$changeFiles): void
@@ -104,7 +107,7 @@ class CollectModifiedFiles implements PipelineStepContract
         $usages = [];
 
         foreach ($this->allowedRoots as $root) {
-            if (!is_dir($root)) {
+            if (! is_dir($root)) {
                 continue;
             }
 
@@ -117,11 +120,11 @@ class CollectModifiedFiles implements PipelineStepContract
 
                 $path = $file->getPathname();
 
-                if (!$this->isAllowed($path) || realpath($path) === realpath($pathToClassFile)) {
+                if (! $this->isAllowed($path) || realpath($path) === realpath($pathToClassFile)) {
                     continue;
                 }
 
-                if (!$this->isClassUsed(file_get_contents($path), $info['fqcn'], $info['className'])) {
+                if (! $this->isClassUsed(file_get_contents($path), $info['fqcn'], $info['className'])) {
                     continue;
                 }
 
