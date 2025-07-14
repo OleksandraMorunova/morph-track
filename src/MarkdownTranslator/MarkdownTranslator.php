@@ -20,6 +20,7 @@ class MarkdownTranslator
         }
 
         $trans = trans($key, $replace, $locale);
+
         return $this->format($markdown, $trans);
     }
 
@@ -27,11 +28,11 @@ class MarkdownTranslator
     {
         $markdown = $this->markdownFormatted ? $markdown : '';
 
-        if(in_array($markdown, [MarkdownSupport::HEADING_H1, MarkdownSupport::HEADING_H2, MarkdownSupport::HEADING_H3])) {
+        if (in_array($markdown, [MarkdownSupport::HEADING_H1, MarkdownSupport::HEADING_H2, MarkdownSupport::HEADING_H3])) {
             return "$markdown $trans";
         }
 
-        if(in_array($markdown, [MarkdownSupport::BOLD, MarkdownSupport::ITALIC, MarkdownSupport::CODE])) {
+        if (in_array($markdown, [MarkdownSupport::BOLD, MarkdownSupport::ITALIC, MarkdownSupport::CODE])) {
             return "$markdown $trans $markdown";
         }
 

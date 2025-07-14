@@ -29,7 +29,7 @@ class CommandGroup extends AbstractInstructionGroup
             $contents = file_get_contents($fullPath);
             preg_match("/signature\s*=\s*[\"']([^\"']+)[\"']/", $contents, $matches);
             if (! empty($matches[1])) {
-                $lines[] = '  - ' . __f(markdown: MarkdownSupport::CODE, text: "php artisan $matches[1]");
+                $lines[] = '  - '.__f(markdown: MarkdownSupport::CODE, text: "php artisan $matches[1]");
             }
         }
 
