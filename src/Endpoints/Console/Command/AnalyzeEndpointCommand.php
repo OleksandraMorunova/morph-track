@@ -7,7 +7,6 @@ use OM\MorphTrack\Endpoints\Dto\Configuration\EndpointsConfig;
 use OM\MorphTrack\Endpoints\Dto\Parameters\EndpointParameters;
 use OM\MorphTrack\Endpoints\Services\EndpointAnalyzer\EndpointAnalyzerService;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\EndpointProcessorService;
-use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\GitHelper;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 
 class AnalyzeEndpointCommand extends Command
