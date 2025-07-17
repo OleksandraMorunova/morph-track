@@ -20,7 +20,7 @@ class DumpRules extends Command
             $this->error("Class $class does not exist");
             $this->line(json_encode([]));
 
-            return CommandAlias::FAILURE;
+            return CommandAlias::SUCCESS;
         }
 
         if (! is_subclass_of($class, FormRequest::class)) {

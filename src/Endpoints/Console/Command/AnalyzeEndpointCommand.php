@@ -39,7 +39,6 @@ class AnalyzeEndpointCommand extends Command
 
         $lines = $resolver->prettyPrint($routes);
         $resolver->displayChanges($lines);
-        GitHelper::dropProject();
 
         return CommandAlias::SUCCESS;
     }
