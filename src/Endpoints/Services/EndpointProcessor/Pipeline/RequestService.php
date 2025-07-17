@@ -8,7 +8,7 @@ class RequestService
 
     public function getLocalRules(string $namespace): array
     {
-        return (new $namespace())->rules();
+        return (new $namespace)->rules();
     }
 
     public function compareRules(array $current, array $main): string

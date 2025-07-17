@@ -7,8 +7,8 @@ use Illuminate\Support\Str;
 use OM\MorphTrack\Endpoints\Contracts\PipelineStepContract;
 use OM\MorphTrack\Endpoints\Dto\Parameters\EndpointParameters;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\EndpointProcessorHelper;
-use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\GitHelper;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\EndpointPipelineContext;
+use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\GitHelper;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\RequestService;
 use OM\MorphTrack\MarkdownSupport;
 use Symfony\Component\Process\Process;
@@ -70,7 +70,7 @@ class ProcessStatusFiles implements PipelineStepContract
             $mainRules = GitHelper::getRulesFromDocker($namespace);
 
             return $this->requestService->compareRules($currentRules, $mainRules);
-        } else if($status == EndpointProcessorHelper::GIT_CHANGE_STATUS) {
+        } elseif ($status == EndpointProcessorHelper::GIT_CHANGE_STATUS) {
             return $this->diffFields($file, $type == EndpointProcessorHelper::RESOURCE);
         }
 

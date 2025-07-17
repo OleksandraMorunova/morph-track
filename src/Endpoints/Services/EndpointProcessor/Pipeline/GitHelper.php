@@ -7,27 +7,28 @@ use Symfony\Component\Process\Process;
 class GitHelper
 {
     protected const CACHE_PROJECT_PATH = 'bootstrap/cache/main_branch_tmp_morph-track_';
+
     public static function getRulesFromDocker(string $namespace, string $branch = 'main'): array
     {
         $repoPath = base_path();
-        $tmpDir = base_path(self::CACHE_PROJECT_PATH . $branch);
+        $tmpDir = base_path(self::CACHE_PROJECT_PATH.$branch);
 
-        if (!is_dir($tmpDir)) {
+        if (! is_dir($tmpDir)) {
             self::createProject($branch, $repoPath, $tmpDir);
         }
 
         try {
             $isInsideDocker = file_exists('/.dockerenv') || getenv('SAIL');
-            $artisanPath = $tmpDir . '/artisan';
+            $artisanPath = $tmpDir.'/artisan';
 
             $processParams = $isInsideDocker ? [
                 'php',
-                $tmpDir . '/artisan',
+                $tmpDir.'/artisan',
                 'rules-dump',
                 $namespace,
             ] : [
                 'docker', 'exec', self::detectLaravelContainerName(),
-                'php', $artisanPath, 'rules-dump', $namespace
+                'php', $artisanPath, 'rules-dump', $namespace,
             ];
 
             $process = new Process($processParams);
@@ -49,14 +50,14 @@ class GitHelper
 
     public static function dropProject(?string $repoPath = null, ?string $tmpDir = null, string $branch = 'main'): void
     {
-        $repoPath = $repoPath?? base_path();
-        $tmpDir = $tmpDir ?? base_path(self::CACHE_PROJECT_PATH . $branch);
+        $repoPath = $repoPath ?? base_path();
+        $tmpDir = $tmpDir ?? base_path(self::CACHE_PROJECT_PATH.$branch);
 
         $rmWorktree = new Process(['git', 'worktree', 'remove', '--force', $tmpDir], $repoPath);
         $rmWorktree->run();
 
-        if (!$rmWorktree->isSuccessful()) {
-            throw new \RuntimeException("Failed to drop project hash of '$branch': " . $rmWorktree->getErrorOutput());
+        if (! $rmWorktree->isSuccessful()) {
+            throw new \RuntimeException("Failed to drop project hash of '$branch': ".$rmWorktree->getErrorOutput());
         }
     }
 
@@ -65,8 +66,8 @@ class GitHelper
         $commitHashProcess = new Process(['git', 'rev-parse', $branch], $repoPath);
         $commitHashProcess->run();
 
-        if (!$commitHashProcess->isSuccessful()) {
-            throw new \RuntimeException("Failed to get commit hash of '$branch': " . $commitHashProcess->getErrorOutput());
+        if (! $commitHashProcess->isSuccessful()) {
+            throw new \RuntimeException("Failed to get commit hash of '$branch': ".$commitHashProcess->getErrorOutput());
         }
 
         $commit = trim($commitHashProcess->getOutput());
@@ -77,15 +78,15 @@ class GitHelper
         $addWorktree = new Process(['git', 'worktree', 'add', $tmpDir, $commit], $repoPath);
         $addWorktree->run();
 
-        if (!$addWorktree->isSuccessful()) {
-            throw new \RuntimeException("Failed to create git worktree: " . $addWorktree->getErrorOutput());
+        if (! $addWorktree->isSuccessful()) {
+            throw new \RuntimeException('Failed to create git worktree: '.$addWorktree->getErrorOutput());
         }
 
-        $copyVendor = new Process(['cp', '-r', $repoPath . '/vendor', $tmpDir . '/vendor']);
+        $copyVendor = new Process(['cp', '-r', $repoPath.'/vendor', $tmpDir.'/vendor']);
         $copyVendor->run();
 
-        if (!$copyVendor->isSuccessful()) {
-            throw new \RuntimeException("Failed to copy vendor: " . $copyVendor->getErrorOutput());
+        if (! $copyVendor->isSuccessful()) {
+            throw new \RuntimeException('Failed to copy vendor: '.$copyVendor->getErrorOutput());
         }
     }
 
@@ -94,8 +95,8 @@ class GitHelper
         $process = new Process(['docker', 'ps', '--format', '{{.Names}} {{.Image}}']);
         $process->run();
 
-        if (!$process->isSuccessful()) {
-            throw new \RuntimeException("Failed to list docker containers: " . $process->getErrorOutput());
+        if (! $process->isSuccessful()) {
+            throw new \RuntimeException('Failed to list docker containers: '.$process->getErrorOutput());
         }
 
         $output = explode("\n", trim($process->getOutput()));
@@ -112,7 +113,6 @@ class GitHelper
             }
         }
 
-        throw new \RuntimeException("Could not detect Laravel container name.");
+        throw new \RuntimeException('Could not detect Laravel container name.');
     }
-
 }
