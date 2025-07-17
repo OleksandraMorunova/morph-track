@@ -7,6 +7,7 @@ use OM\MorphTrack\Endpoints\Dto\Configuration\EndpointsConfig;
 use OM\MorphTrack\Endpoints\Dto\Parameters\EndpointParameters;
 use OM\MorphTrack\Endpoints\Services\EndpointAnalyzer\EndpointAnalyzerService;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\EndpointProcessorService;
+use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\GitHelper;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 
 class AnalyzeEndpointCommand extends Command
@@ -38,6 +39,7 @@ class AnalyzeEndpointCommand extends Command
 
         $lines = $resolver->prettyPrint($routes);
         $resolver->displayChanges($lines);
+        GitHelper::dropProject();
 
         return CommandAlias::SUCCESS;
     }
