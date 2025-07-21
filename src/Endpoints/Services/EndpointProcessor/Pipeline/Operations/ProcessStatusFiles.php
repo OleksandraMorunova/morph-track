@@ -7,8 +7,8 @@ use Illuminate\Support\Str;
 use OM\MorphTrack\Endpoints\Contracts\PipelineStepContract;
 use OM\MorphTrack\Endpoints\Dto\Parameters\EndpointParameters;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\EndpointProcessorHelper;
-use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\GitHelper;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\EndpointPipelineContext;
+use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\GitHelper;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\RequestService;
 use OM\MorphTrack\MarkdownSupport;
 use Symfony\Component\Process\Process;
@@ -24,6 +24,7 @@ class ProcessStatusFiles implements PipelineStepContract
     protected string $from;
 
     protected string $to;
+
     protected RequestService $requestService;
 
     public function handle(EndpointPipelineContext $context, Closure $next): EndpointPipelineContext
@@ -54,7 +55,7 @@ class ProcessStatusFiles implements PipelineStepContract
         $type = Str::contains($file, 'app/Http/Resources/') ? EndpointProcessorHelper::RESOURCE : EndpointProcessorHelper::REQUEST;
         $lineStatus = $this->getLabels($status, $file, $type, $namespace);
 
-        if(!$lineStatus && $type == EndpointProcessorHelper::REQUEST) {
+        if (! $lineStatus && $type == EndpointProcessorHelper::REQUEST) {
             return;
         }
 
@@ -73,7 +74,7 @@ class ProcessStatusFiles implements PipelineStepContract
             $mainRules = GitHelper::getRulesFromDocker($namespace);
 
             return $this->requestService->compareRules($currentRules, $mainRules);
-        } else if($status == EndpointProcessorHelper::GIT_CHANGE_STATUS) {
+        } elseif ($status == EndpointProcessorHelper::GIT_CHANGE_STATUS) {
             return $this->diffFields($file, $type == EndpointProcessorHelper::RESOURCE);
         }
 
@@ -93,7 +94,7 @@ class ProcessStatusFiles implements PipelineStepContract
         ] = $this->extractKeysFromDiff($pattern, $process->getOutput());
 
         $format = fn (string $action, array $fields) => $fields ?
-            __m(key: "analyze-endpoints::$action", replace: ['fields' => implode(',', $fields)], locale: $this->localization) :            null;
+            __m(key: "analyze-endpoints::$action", replace: ['fields' => implode(',', $fields)], locale: $this->localization) : null;
 
         $messages = array_filter([
             $format('field_added', $added),

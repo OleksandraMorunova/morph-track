@@ -12,7 +12,7 @@ class GitHelper
     public static function getRulesFromDocker(string $namespace, string $branch = 'main'): array
     {
         $repoPath = '/var/www/html';
-        $tmpDir = self::CACHE_PROJECT_PATH . $branch;
+        $tmpDir = self::CACHE_PROJECT_PATH.$branch;
 
         if (! is_dir($tmpDir)) {
             self::createProject($branch, $repoPath, $tmpDir);
@@ -20,7 +20,7 @@ class GitHelper
 
         try {
             $isInsideDocker = file_exists('/.dockerenv') || getenv('SAIL');
-            $artisanPath    = $tmpDir . '/artisan';
+            $artisanPath = $tmpDir.'/artisan';
 
             if ($isInsideDocker) {
                 $processParams = [
@@ -54,7 +54,7 @@ class GitHelper
         $rmWorktree = new Process(['git', 'worktree', 'remove', '--force', $tmpDir], $repoPath);
         $rmWorktree->run();
         if (! $rmWorktree->isSuccessful()) {
-            throw new RuntimeException("Failed to drop worktree for '{$branch}': " . $rmWorktree->getErrorOutput());
+            throw new RuntimeException("Failed to drop worktree for '{$branch}': ".$rmWorktree->getErrorOutput());
         }
     }
 
@@ -72,13 +72,13 @@ class GitHelper
         $process = new Process(['docker', 'ps', '--format', '{{.Names}} {{.Image}}']);
         $process->run();
         if (! $process->isSuccessful()) {
-            throw new RuntimeException('Cannot list Docker containers: ' . $process->getErrorOutput());
+            throw new RuntimeException('Cannot list Docker containers: '.$process->getErrorOutput());
         }
         foreach (explode("\n", trim($process->getOutput())) as $line) {
             [$name, $image] = array_pad(explode(' ', $line, 2), 2, null);
             if (
                 str_contains($image, 'laravel') ||
-                str_contains($image, 'sail')    ||
+                str_contains($image, 'sail') ||
                 str_contains($name, 'api')
             ) {
                 return $name;

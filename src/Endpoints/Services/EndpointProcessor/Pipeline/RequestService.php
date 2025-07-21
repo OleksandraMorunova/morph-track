@@ -10,7 +10,7 @@ class RequestService
 
     public function getLocalRules(string $namespace): array
     {
-        return (new $namespace())->rules();
+        return (new $namespace)->rules();
     }
 
     public function compareRules(array $current, array $main): ?string
@@ -18,7 +18,7 @@ class RequestService
         $added = array_diff_key($current, $main);
         $removed = array_diff_key($main, $current);
 
-        if (!$added && !$removed) {
+        if (! $added && ! $removed) {
             $rules = $this->compareFields($current, $main);
 
             return $rules ?
@@ -26,7 +26,7 @@ class RequestService
                 null;
         }
 
-        $format = fn(string $key, array $fields) => $fields
+        $format = fn (string $key, array $fields) => $fields
             ? __m("analyze-endpoints::$key", ['fields' => implode(', ', array_keys($fields))], $this->localization)
             : null;
 
@@ -45,7 +45,7 @@ class RequestService
         foreach ($current as $field => $rulesCurrent) {
             $rulesMain = $main[$field] ?? [];
 
-            if($rulesMain == $rulesCurrent) {
+            if ($rulesMain == $rulesCurrent) {
                 continue;
             }
 
@@ -54,14 +54,14 @@ class RequestService
 
                 $value = $this->normalize($ruleCurrent, $ruleMain, $field);
 
-                if(!$value) {
+                if (! $value) {
                     continue;
                 }
 
-                if(!isset($diffs[$field])) {
+                if (! isset($diffs[$field])) {
                     $diffs[$field] = $value;
                 } else {
-                    $diffs[$field] =  rtrim($diffs[$field], ', ')  . ', ' . $value;
+                    $diffs[$field] = rtrim($diffs[$field], ', ').', '.$value;
                 }
             }
         }
@@ -76,7 +76,7 @@ class RequestService
             $mainStr = $ruleMain instanceof In ? (string) $ruleMain : '';
 
             if ($ruleStr !== $mainStr) {
-               return "$field: $ruleStr";
+                return "$field: $ruleStr";
             }
         } elseif (is_string($ruleCurrent)) {
             if ($ruleCurrent !== $ruleMain) {
