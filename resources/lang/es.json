@@ -4,6 +4,7 @@
     "analyze-endpoints::field_changed": "formato cambiado",
     "analyze-endpoints::field_new": "nuevo",
     "analyze-endpoints::no_changes": "sin cambios",
+    "analyze-endpoints::rule_added": "reglas añadidas - :fields",
     "analyze-endpoints::no_changes_detected": "✅ No se detectaron cambios. Todos los endpoints están actualizados ✨",
     "analyze-endpoints::changes_detected": "🔁 Se detectaron cambios en los endpoints:",
     "analyze-endpoints::column_method": "Método",

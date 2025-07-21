@@ -7,6 +7,7 @@ use OM\MorphTrack\Endpoints\Contracts\PipelineStepContract;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\EndpointPipelineContext;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use SplFileInfo;
 use Symfony\Component\Process\Process;
 
 class CollectModifiedFiles implements PipelineStepContract
@@ -29,9 +30,7 @@ class CollectModifiedFiles implements PipelineStepContract
 
     protected function collectChangedFiles($params): array
     {
-        $process = new Process([
-            'git', 'diff', '--name-only', "$params->from...$params->to",
-        ]);
+        $process = new Process(['git', 'diff', '--name-only', "$params->from...$params->to"]);
         $process->run();
 
         return preg_split('/\R/', trim($process->getOutput()));
@@ -41,8 +40,12 @@ class CollectModifiedFiles implements PipelineStepContract
     {
         $changeFiles = [];
         foreach ($allRequestFiles as $file) {
-
             if (! $this->isAllowed($file)) {
+                continue;
+            }
+
+            $name = basename($file);
+            if (! str_ends_with($name, 'Request.php') && ! str_ends_with($name, 'Resource.php')) {
                 continue;
             }
 
@@ -98,8 +101,7 @@ class CollectModifiedFiles implements PipelineStepContract
     {
         $realPath = realpath($path);
 
-        return collect($this->allowedRoots)
-            ->some(fn ($root) => str_starts_with($realPath, realpath($root)));
+        return collect($this->allowedRoots)->some(fn ($root) => str_starts_with($realPath, realpath($root)));
     }
 
     public function find(string $pathToClassFile, array $info, array &$changeFiles): void
@@ -114,28 +116,34 @@ class CollectModifiedFiles implements PipelineStepContract
             $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root));
 
             foreach ($files as $file) {
-                if ($file->getExtension() !== 'php') {
-                    continue;
-                }
-
-                $path = $file->getPathname();
-
-                if (! $this->isAllowed($path) || realpath($path) === realpath($pathToClassFile)) {
-                    continue;
-                }
-
-                if (! $this->isClassUsed(file_get_contents($path), $info['fqcn'], $info['className'])) {
-                    continue;
-                }
-
-                $usages[] = $path;
+                $this->findClassUsages($file, $usages, $pathToClassFile, $info);
             }
         }
 
         $classes = empty($usages) ? [$pathToClassFile] : $usages;
-        $changeFiles = array_unique([
-            ...$changeFiles,
-            ...$classes,
-        ]);
+
+        $changeFiles = array_values(array_filter(
+            array_unique([...$changeFiles, ...$classes]),
+            fn ($file) => $this->isAllowed($file)
+        ));
+    }
+
+    protected function findClassUsages(SplFileInfo $file, array &$usages, string $pathToClassFile, array $info): void
+    {
+        if ($file->getExtension() !== 'php') {
+            return;
+        }
+
+        $path = $file->getPathname();
+
+        if (! $this->isAllowed($path) || realpath($path) === realpath($pathToClassFile)) {
+            return;
+        }
+
+        if (! $this->isClassUsed(file_get_contents($path), $info['fqcn'], $info['className'])) {
+            return;
+        }
+
+        $usages[] = $path;
     }
 }

@@ -7,7 +7,9 @@ use Illuminate\Support\Str;
 use OM\MorphTrack\Endpoints\Contracts\PipelineStepContract;
 use OM\MorphTrack\Endpoints\Dto\Parameters\EndpointParameters;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\EndpointProcessorHelper;
+use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\GitHelper;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\EndpointPipelineContext;
+use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\RequestService;
 use OM\MorphTrack\MarkdownSupport;
 use Symfony\Component\Process\Process;
 
@@ -22,10 +24,12 @@ class ProcessStatusFiles implements PipelineStepContract
     protected string $from;
 
     protected string $to;
+    protected RequestService $requestService;
 
     public function handle(EndpointPipelineContext $context, Closure $next): EndpointPipelineContext
     {
         $this->localization = $context->getConfig()->globalConfig->localization;
+        $this->requestService = new RequestService($this->localization);
         $params = $context->getParams();
 
         [$this->from, $this->to] = [$params->from, $params->to];
@@ -48,7 +52,11 @@ class ProcessStatusFiles implements PipelineStepContract
 
         $status = EndpointProcessorHelper::gitFileStatus($params, $file);
         $type = Str::contains($file, 'app/Http/Resources/') ? EndpointProcessorHelper::RESOURCE : EndpointProcessorHelper::REQUEST;
-        $lineStatus = $this->getLabels($status, $file, $type);
+        $lineStatus = $this->getLabels($status, $file, $type, $namespace);
+
+        if(!$lineStatus && $type == EndpointProcessorHelper::REQUEST) {
+            return;
+        }
 
         $details[$base] = [
             'status' => $lineStatus,
@@ -58,9 +66,14 @@ class ProcessStatusFiles implements PipelineStepContract
         ];
     }
 
-    public function getLabels(string $status, string $file, string $type): string
+    public function getLabels(string $status, string $file, string $type, string $namespace): ?string
     {
-        if ($status == EndpointProcessorHelper::GIT_CHANGE_STATUS) {
+        if ($type == EndpointProcessorHelper::REQUEST) {
+            $currentRules = $this->requestService->getLocalRules($namespace);
+            $mainRules = GitHelper::getRulesFromDocker($namespace);
+
+            return $this->requestService->compareRules($currentRules, $mainRules);
+        } else if($status == EndpointProcessorHelper::GIT_CHANGE_STATUS) {
             return $this->diffFields($file, $type == EndpointProcessorHelper::RESOURCE);
         }
 
@@ -80,8 +93,7 @@ class ProcessStatusFiles implements PipelineStepContract
         ] = $this->extractKeysFromDiff($pattern, $process->getOutput());
 
         $format = fn (string $action, array $fields) => $fields ?
-           __m(key: "analyze-endpoints::$action", replace: ['fields' => implode(',', $fields)], locale: $this->localization) :
-            null;
+            __m(key: "analyze-endpoints::$action", replace: ['fields' => implode(',', $fields)], locale: $this->localization) :            null;
 
         $messages = array_filter([
             $format('field_added', $added),

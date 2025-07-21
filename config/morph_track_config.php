@@ -27,7 +27,7 @@ return [
     ],
     'scramble' => [
         'use' => false,
-        'server' => 'Live',
+        'server' => 'Dev',
     ],
     'markdown_formatted' => false,
 ];
