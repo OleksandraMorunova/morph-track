@@ -57,7 +57,6 @@ class ObjectType extends Type
         $getProtectedValue = function ($obj, $name) {
             $array = (array) $obj;
             $prefix = chr(0).'*'.chr(0);
-            dump($prefix);
 
             return $array[$prefix.$name];
         };

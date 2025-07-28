@@ -1,39 +1,25 @@
 <?php
 
-namespace OM\MorphTrack\Endpoints\Console\Command;
+namespace OM\MorphTrack\Endpoints\Console\Command\Dev;
 
-use Illuminate\Console\Command;
 use Illuminate\Foundation\Http\FormRequest;
-use Symfony\Component\Console\Command\Command as CommandAlias;
 
-class DumpRules extends Command
+class DumpRequest extends CoreDump
 {
-    protected $signature = 'rules-dump {class}';
+    protected $signature = 'request-dump {class}';
 
     protected $description = 'Dump rules of the given FormRequest class as JSON';
 
-    public function handle(): int
+    protected function subclass(): string
     {
-        $class = $this->argument('class');
+        return FormRequest::class;
+    }
 
-        if (! class_exists($class)) {
-            $this->error("Class $class does not exist");
-            $this->line(json_encode([]));
-
-            return CommandAlias::FAILURE;
-        }
-
-        if (! is_subclass_of($class, FormRequest::class)) {
-            $this->error("Class $class is not a FormRequest");
-
-            return CommandAlias::FAILURE;
-        }
-
+    protected function process(string $class): void
+    {
         $rules = (new $class)->rules();
         $serialized = $this->normalizeRules($rules);
         $this->line(json_encode($serialized, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-
-        return CommandAlias::SUCCESS;
     }
 
     protected function normalizeRules(array $rules): array

@@ -26,13 +26,13 @@ class GitHelper
             if ($isInsideDocker) {
                 $processParams = [
                     'php', $artisanPath,
-                    'rules-dump', $namespace,
+                    'request-dump', $namespace,
                 ];
             } else {
                 $processParams = [
                     'docker', 'exec', self::detectLaravelContainerName(),
                     'php', $artisanPath,
-                    'rules-dump', $namespace,
+                    'request-dump', $namespace,
                 ];
             }
 
