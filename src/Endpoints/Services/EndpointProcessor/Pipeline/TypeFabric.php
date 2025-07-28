@@ -2,7 +2,6 @@
 
 namespace OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline;
 
-use Illuminate\Validation\Rules\Enum;
 use InvalidArgumentException;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\Type\Types\ArrayType;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\Type\Types\NumberType;
@@ -14,13 +13,13 @@ class TypeFabric
 {
     public function getTypeClass(mixed $rule): Type
     {
-        if ( is_string($rule)) {
+        if (is_string($rule)) {
             $class = StringType::class;
-        } else if (is_numeric($rule)) {
+        } elseif (is_numeric($rule)) {
             $class = NumberType::class;
-        } else if (is_array($rule)) {
+        } elseif (is_array($rule)) {
             $class = ArrayType::class;
-        } else if (is_object($rule)) {
+        } elseif (is_object($rule)) {
             $class = ObjectType::class;
         } else {
             throw new InvalidArgumentException(sprintf('Unsupported rule type: %s', get_debug_type($rule)));
@@ -33,7 +32,7 @@ class TypeFabric
 
     protected function specificTypeClass(mixed $rule, string &$class): void
     {
-        if(is_array($rule) && isset($rule['rule'])) {
+        if (is_array($rule) && isset($rule['rule'])) {
             $class = ObjectType::class;
         }
     }

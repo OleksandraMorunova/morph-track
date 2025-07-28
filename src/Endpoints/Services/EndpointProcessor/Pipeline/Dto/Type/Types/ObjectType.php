@@ -18,9 +18,10 @@ class ObjectType extends Type
         try {
             return (string) $this->value;
         } catch (Throwable $throwable) {
-            if(is_array($this->value)) {
+            if (is_array($this->value)) {
                 return implode(',', $this->value);
             }
+
             return get_class($this->value);
         }
     }
@@ -54,11 +55,11 @@ class ObjectType extends Type
     public function enum(array|Enum $rule): void
     {
         $getProtectedValue = function ($obj, $name) {
-            $array = (array)$obj;
-            $prefix = chr(0) . '*' . chr(0);
+            $array = (array) $obj;
+            $prefix = chr(0).'*'.chr(0);
             dump($prefix);
 
-            return $array[$prefix . $name];
+            return $array[$prefix.$name];
         };
 
         $this->value = $getProtectedValue($rule, 'type');
@@ -66,6 +67,6 @@ class ObjectType extends Type
 
     public function custom(array $rule): void
     {
-        $this->value = $rule[chr(0) . '*' . chr(0) . 'values'] ?? [];
+        $this->value = $rule[chr(0).'*'.chr(0).'values'] ?? [];
     }
 }
