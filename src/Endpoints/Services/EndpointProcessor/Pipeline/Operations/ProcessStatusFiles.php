@@ -24,12 +24,12 @@ class ProcessStatusFiles implements PipelineStepContract
     protected string $from;
 
     protected string $to;
-    protected RequestService $requestService;
+
+    public function __construct(protected RequestService $requestService) {}
 
     public function handle(EndpointPipelineContext $context, Closure $next): EndpointPipelineContext
     {
         $this->localization = $context->getConfig()->globalConfig->localization;
-        $this->requestService = new RequestService($this->localization);
         $params = $context->getParams();
 
         [$this->from, $this->to] = [$params->from, $params->to];
@@ -70,9 +70,10 @@ class ProcessStatusFiles implements PipelineStepContract
     {
         if ($type == EndpointProcessorHelper::REQUEST) {
             $currentRules = $this->requestService->getLocalRules($namespace);
-            $mainRules = GitHelper::getRulesFromDocker($namespace);
+            $mainRules = GitHelper::getRulesFromDocker($namespace, $this->from);
 
-            return $this->requestService->compareRules($currentRules, $mainRules);
+            return $this->requestService->compareRules($currentRules, $mainRules, $this->localization) ??
+                __('analyze-endpoints::field_changed', [], $this->localization);
         } else if($status == EndpointProcessorHelper::GIT_CHANGE_STATUS) {
             return $this->diffFields($file, $type == EndpointProcessorHelper::RESOURCE);
         }
@@ -93,7 +94,7 @@ class ProcessStatusFiles implements PipelineStepContract
         ] = $this->extractKeysFromDiff($pattern, $process->getOutput());
 
         $format = fn (string $action, array $fields) => $fields ?
-            __m(key: "analyze-endpoints::$action", replace: ['fields' => implode(',', $fields)], locale: $this->localization) :            null;
+            __m(key: "analyze-endpoints::$action", replace: ['fields' => implode(',', $fields)], locale: $this->localization) : null;
 
         $messages = array_filter([
             $format('field_added', $added),

@@ -7,15 +7,15 @@ use Symfony\Component\Process\Process;
 
 class GitHelper
 {
-    protected const CACHE_PROJECT_PATH = '/tmp/morph-track_';
+    public const BASE_PROJECT_PATH = '/tmp/morph-track_';
+    public const REPO_PATH = '/var/www/html';
 
     public static function getRulesFromDocker(string $namespace, string $branch = 'main'): array
     {
-        $repoPath = '/var/www/html';
-        $tmpDir = self::CACHE_PROJECT_PATH . $branch;
+        $tmpDir = self::BASE_PROJECT_PATH . $branch;
 
         if (! is_dir($tmpDir)) {
-            self::createProject($branch, $repoPath, $tmpDir);
+            self::createProject($branch, $tmpDir);
         }
 
         try {
@@ -44,27 +44,28 @@ class GitHelper
 
             return json_decode($process->getOutput(), true) ?: [];
         } catch (\Throwable $e) {
-            self::dropProject($repoPath, $tmpDir, $branch);
+            self::dropProject($tmpDir, $branch);
             throw new RuntimeException($e->getMessage(), 0, $e);
         }
     }
 
-    public static function dropProject(string $repoPath, string $tmpDir, string $branch = 'main'): void
+    public static function dropProject(string $tmpDir, string $branch = 'main'): void
     {
-        $rmWorktree = new Process(['git', 'worktree', 'remove', '--force', $tmpDir], $repoPath);
+        $rmWorktree = new Process(['git', 'worktree', 'remove', '--force', $tmpDir], self::REPO_PATH);
         $rmWorktree->run();
         if (! $rmWorktree->isSuccessful()) {
             throw new RuntimeException("Failed to drop worktree for '{$branch}': " . $rmWorktree->getErrorOutput());
         }
     }
 
-    protected static function createProject(string $branch, string $repoPath, string $tmpDir): void
+    protected static function createProject(string $branch, string $tmpDir): void
     {
+        $repoPath = self::REPO_PATH;
         $commitHash = (new Process(['git', 'rev-parse', $branch], $repoPath))->mustRun()->getOutput();
         (new Process(['git', 'worktree', 'prune'], $repoPath))->run();
         (new Process(['git', 'worktree', 'add', $tmpDir, trim($commitHash)], $repoPath))
             ->mustRun();
-        (new Process(['cp', '-r', "{$repoPath}/vendor", "{$tmpDir}/vendor"]))->mustRun();
+        (new Process(['cp', '-r', "$repoPath/vendor", "$tmpDir/vendor"]))->mustRun();
     }
 
     protected static function detectLaravelContainerName(): string
