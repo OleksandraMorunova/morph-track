@@ -19,6 +19,12 @@ php artisan vendor:publish --tag=endpoints_config
 php artisan analyze:endpoints
 php artisan generate:instructions
 ```
+- Dev Commands
+```bash
+php artisan worktree:list
+php artisan worktree:drop
+```
+
 ---
 ## Common Usages
 ### 🌐 Language Support - field_change_locale

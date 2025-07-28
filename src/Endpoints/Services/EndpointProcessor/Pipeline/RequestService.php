@@ -2,88 +2,133 @@
 
 namespace OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline;
 
-use Illuminate\Validation\Rules\In;
+use OM\MorphTrack\MarkdownSupport;
 
 class RequestService
 {
-    public function __construct(protected string $localization) {}
+    protected string $namespace;
+    protected string $localization;
+    public function __construct(
+        protected TypeFabric $typeFabric,
+    ) {}
 
     public function getLocalRules(string $namespace): array
     {
+        $this->namespace = $namespace;
         return (new $namespace())->rules();
     }
 
-    public function compareRules(array $current, array $main): ?string
+    public function compareRules(array $current, array $main, string $localization): ?string
     {
-        $added = array_diff_key($current, $main);
-        $removed = array_diff_key($main, $current);
+        $this->localization = $localization;
 
-        if (!$added && !$removed) {
-            $rules = $this->compareFields($current, $main);
+        [
+            'keys' => $keysModifiedValue,
+            'modified' => $modifiedValue
+        ] = $this->compare($current, $main);
 
-            return $rules ?
-                __m('analyze-endpoints::rule_added', ['fields' => $rules], $this->localization) :
-                null;
+        if($keysModifiedValue && $modifiedValue) {
+            return $keysModifiedValue.', '.$modifiedValue;
         }
 
-        $format = fn(string $key, array $fields) => $fields
-            ? __m("analyze-endpoints::$key", ['fields' => implode(', ', array_keys($fields))], $this->localization)
-            : null;
+        if($keysModifiedValue) {
+            return $keysModifiedValue;
+        }
+
+        return $modifiedValue;
+    }
+
+    protected function compare(array $current, array $main): array
+    {
+        $modifiedCurrent = [];
+        foreach ($current as $key => $value) {
+            foreach ($value as $rule) {
+                if(!isset($modifiedCurrent[$key])) {
+                    $modifiedCurrent[$key] = $key.': '.$this->typeFabric->transform($rule);
+                } else {
+                    $modifiedCurrent[$key] .= '; '.$this->typeFabric->transform( $rule);
+                }
+            }
+        }
+
+        $modifiedMain = [];
+        foreach ($main as $key => $value) {
+            foreach ($value as $rule) {
+                if(!isset($modifiedMain[$key])) {
+                    $modifiedMain[$key] = $key.': '.$this->typeFabric->transform($rule);
+                } else {
+                    $modifiedMain[$key] .= '; '.$this->typeFabric->transform($rule);
+                }
+            }
+        }
+
+        $commonKeys = array_intersect_key($modifiedCurrent, $modifiedMain);
+
+        $diffs = [];
+
+        foreach ($commonKeys as $key => $currentValue) {
+            $mainValue = $modifiedMain[$key];
+
+            $currentParts = explode(':', $currentValue, 2);
+            $mainParts = explode(':', $mainValue, 2);
+
+
+            if (count($currentParts) < 2 || count($mainParts) < 2) {
+                continue;
+            }
+
+            $currentRuleBody = explode(':', $currentValue, 2)[1] ?? '';
+            $mainRuleBody = explode(':', $mainValue, 2)[1] ?? '';
+
+            preg_match_all('/"([^"]+)"/', $currentRuleBody, $currentMatches);
+            preg_match_all('/"([^"]+)"/', $mainRuleBody, $mainMatches);
+
+            $currentValues = $currentMatches[1] ?? [];
+            $mainValues = $mainMatches[1] ?? [];
+
+            $unique = array_diff($currentValues, $mainValues);
+
+            if (!empty($unique)) {
+                $quoted = array_map(fn($v) => "\"$v\"", $unique);
+                $diffs[$key] = 'in:' . implode(',', $quoted);
+            }
+        }
+
+        $diffs = $diffs ? __f(markdown: MarkdownSupport::CODE, text: implode('; ', $diffs)) : '';
+
+        $rulesArray = $diffs ?
+            __m(key: 'analyze-endpoints::rule_added',
+                replace: ['fields' => $diffs],
+                locale: $this->localization
+            ) : null;
+
+        return [
+            'keys' => $this->compareByKeys($modifiedCurrent, $modifiedMain),
+            'modified' => $rulesArray,
+        ];
+    }
+
+    public function compareByKeys(array $modifiedCurrent, array $modifiedMain): ?string
+    {
+        $added = array_diff_key($modifiedCurrent, $modifiedMain);
+        $removed = array_diff_key($modifiedMain, $modifiedCurrent);
+
+        $format = function (string $key, array $fields) {
+            $fields = $fields ? __f(markdown: MarkdownSupport::CODE, text: implode(', ', array_keys($fields))) : null;
+
+            return $fields
+                ? __m(key: "analyze-endpoints::$key",
+                replace: ['fields' => $fields],
+                locale: $this->localization
+            ) : null;
+        };
 
         $messages = array_filter([
             $format('field_added', $added),
             $format('field_removed', $removed),
         ]);
 
-        return $messages ? implode('; ', $messages) : __('analyze-endpoints::field_changed', [], $this->localization);
+        return $messages ? implode('; ', $messages) : null;
     }
 
-    protected function compareFields(array $current, array $main): string
-    {
-        $diffs = [];
-
-        foreach ($current as $field => $rulesCurrent) {
-            $rulesMain = $main[$field] ?? [];
-
-            if($rulesMain == $rulesCurrent) {
-                continue;
-            }
-
-            foreach ($rulesCurrent as $index => $ruleCurrent) {
-                $ruleMain = $rulesMain[$index] ?? null;
-
-                $value = $this->normalize($ruleCurrent, $ruleMain, $field);
-
-                if(!$value) {
-                    continue;
-                }
-
-                if(!isset($diffs[$field])) {
-                    $diffs[$field] = $value;
-                } else {
-                    $diffs[$field] =  rtrim($diffs[$field], ', ')  . ', ' . $value;
-                }
-            }
-        }
-
-        return implode('; ', $diffs);
-    }
-
-    protected function normalize($ruleCurrent, $ruleMain, $field): ?string
-    {
-        if ($ruleCurrent instanceof In) {
-            $ruleStr = (string) $ruleCurrent;
-            $mainStr = $ruleMain instanceof In ? (string) $ruleMain : '';
-
-            if ($ruleStr !== $mainStr) {
-               return "$field: $ruleStr";
-            }
-        } elseif (is_string($ruleCurrent)) {
-            if ($ruleCurrent !== $ruleMain) {
-                return "$field: $ruleCurrent";
-            }
-        }
-
-        return null;
-    }
 }
