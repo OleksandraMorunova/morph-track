@@ -8,6 +8,7 @@ use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\GitHelper;
 class ListWorktrees extends Command
 {
     protected $signature = 'worktree:list';
+
     protected $description = 'Display all local Git worktrees';
 
     public function handle(): int
@@ -16,6 +17,7 @@ class ListWorktrees extends Command
 
         if (empty($roots)) {
             $this->warn('No worktree directories found');
+
             return self::SUCCESS;
         }
 
@@ -24,15 +26,16 @@ class ListWorktrees extends Command
         foreach ($roots as $root) {
             $rootName = basename($root);
 
-            if (file_exists($root . '/.git') || file_exists($root . '/artisan')) {
+            if (file_exists($root.'/.git') || file_exists($root.'/artisan')) {
                 $this->line("- $root → <fg=cyan>$rootName</>");
                 $found = true;
+
                 continue;
             }
 
             $subdirs = glob("$root/*", GLOB_ONLYDIR);
             foreach ($subdirs as $branchPath) {
-                if (!file_exists($branchPath . '/artisan') || !file_exists($branchPath . '/.git')) {
+                if (! file_exists($branchPath.'/artisan') || ! file_exists($branchPath.'/.git')) {
                     continue;
                 }
 

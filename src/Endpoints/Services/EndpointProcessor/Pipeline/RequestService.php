@@ -7,7 +7,9 @@ use OM\MorphTrack\MarkdownSupport;
 class RequestService
 {
     protected string $namespace;
+
     protected string $localization;
+
     public function __construct(
         protected TypeFabric $typeFabric,
     ) {}
@@ -15,7 +17,8 @@ class RequestService
     public function getLocalRules(string $namespace): array
     {
         $this->namespace = $namespace;
-        return (new $namespace())->rules();
+
+        return (new $namespace)->rules();
     }
 
     public function compareRules(array $current, array $main, string $localization): ?string
@@ -27,11 +30,11 @@ class RequestService
             'modified' => $modifiedValue
         ] = $this->compare($current, $main);
 
-        if($keysModifiedValue && $modifiedValue) {
+        if ($keysModifiedValue && $modifiedValue) {
             return $keysModifiedValue.', '.$modifiedValue;
         }
 
-        if($keysModifiedValue) {
+        if ($keysModifiedValue) {
             return $keysModifiedValue;
         }
 
@@ -43,10 +46,10 @@ class RequestService
         $modifiedCurrent = [];
         foreach ($current as $key => $value) {
             foreach ($value as $rule) {
-                if(!isset($modifiedCurrent[$key])) {
+                if (! isset($modifiedCurrent[$key])) {
                     $modifiedCurrent[$key] = $key.': '.$this->typeFabric->transform($rule);
                 } else {
-                    $modifiedCurrent[$key] .= '; '.$this->typeFabric->transform( $rule);
+                    $modifiedCurrent[$key] .= '; '.$this->typeFabric->transform($rule);
                 }
             }
         }
@@ -54,7 +57,7 @@ class RequestService
         $modifiedMain = [];
         foreach ($main as $key => $value) {
             foreach ($value as $rule) {
-                if(!isset($modifiedMain[$key])) {
+                if (! isset($modifiedMain[$key])) {
                     $modifiedMain[$key] = $key.': '.$this->typeFabric->transform($rule);
                 } else {
                     $modifiedMain[$key] .= '; '.$this->typeFabric->transform($rule);
@@ -72,7 +75,6 @@ class RequestService
             $currentParts = explode(':', $currentValue, 2);
             $mainParts = explode(':', $mainValue, 2);
 
-
             if (count($currentParts) < 2 || count($mainParts) < 2) {
                 continue;
             }
@@ -88,9 +90,9 @@ class RequestService
 
             $unique = array_diff($currentValues, $mainValues);
 
-            if (!empty($unique)) {
-                $quoted = array_map(fn($v) => "\"$v\"", $unique);
-                $diffs[$key] = 'in:' . implode(',', $quoted);
+            if (! empty($unique)) {
+                $quoted = array_map(fn ($v) => "\"$v\"", $unique);
+                $diffs[$key] = 'in:'.implode(',', $quoted);
             }
         }
 
@@ -118,9 +120,9 @@ class RequestService
 
             return $fields
                 ? __m(key: "analyze-endpoints::$key",
-                replace: ['fields' => $fields],
-                locale: $this->localization
-            ) : null;
+                    replace: ['fields' => $fields],
+                    locale: $this->localization
+                ) : null;
         };
 
         $messages = array_filter([
@@ -130,5 +132,4 @@ class RequestService
 
         return $messages ? implode('; ', $messages) : null;
     }
-
 }

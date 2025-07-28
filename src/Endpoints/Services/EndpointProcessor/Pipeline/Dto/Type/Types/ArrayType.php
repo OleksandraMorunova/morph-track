@@ -12,6 +12,7 @@ class ArrayType extends Type
     public function toString(): string
     {
         dump($this->value);
+
         return implode(', ', $this->value);
     }
 

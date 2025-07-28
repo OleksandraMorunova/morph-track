@@ -7,8 +7,8 @@ use Illuminate\Support\Str;
 use OM\MorphTrack\Endpoints\Contracts\PipelineStepContract;
 use OM\MorphTrack\Endpoints\Dto\Parameters\EndpointParameters;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\EndpointProcessorHelper;
-use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\GitHelper;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\EndpointPipelineContext;
+use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\GitHelper;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\RequestService;
 use OM\MorphTrack\MarkdownSupport;
 use Symfony\Component\Process\Process;
@@ -54,7 +54,7 @@ class ProcessStatusFiles implements PipelineStepContract
         $type = Str::contains($file, 'app/Http/Resources/') ? EndpointProcessorHelper::RESOURCE : EndpointProcessorHelper::REQUEST;
         $lineStatus = $this->getLabels($status, $file, $type, $namespace);
 
-        if(!$lineStatus && $type == EndpointProcessorHelper::REQUEST) {
+        if (! $lineStatus && $type == EndpointProcessorHelper::REQUEST) {
             return;
         }
 
@@ -74,7 +74,7 @@ class ProcessStatusFiles implements PipelineStepContract
 
             return $this->requestService->compareRules($currentRules, $mainRules, $this->localization) ??
                 __('analyze-endpoints::field_changed', [], $this->localization);
-        } else if($status == EndpointProcessorHelper::GIT_CHANGE_STATUS) {
+        } elseif ($status == EndpointProcessorHelper::GIT_CHANGE_STATUS) {
             return $this->diffFields($file, $type == EndpointProcessorHelper::RESOURCE);
         }
 
