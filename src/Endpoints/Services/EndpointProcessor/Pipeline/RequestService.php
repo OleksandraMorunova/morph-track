@@ -41,29 +41,33 @@ class RequestService
         return $modifiedValue;
     }
 
+    public function compareByKeys(array $modifiedCurrent, array $modifiedMain): ?string
+    {
+        $added = array_diff_key($modifiedCurrent, $modifiedMain);
+        $removed = array_diff_key($modifiedMain, $modifiedCurrent);
+
+        $format = function (string $key, array $fields) {
+            $fields = $fields ? __f(markdown: MarkdownSupport::CODE, text: implode(', ', array_keys($fields))) : null;
+
+            return $fields
+                ? __m(key: "analyze-endpoints::$key",
+                    replace: ['fields' => $fields],
+                    locale: $this->localization
+                ) : null;
+        };
+
+        $messages = array_filter([
+            $format('field_added', $added),
+            $format('field_removed', $removed),
+        ]);
+
+        return $messages ? implode('; ', $messages) : null;
+    }
+
     protected function compare(array $current, array $main): array
     {
-        $modifiedCurrent = [];
-        foreach ($current as $key => $value) {
-            foreach ($value as $rule) {
-                if (! isset($modifiedCurrent[$key])) {
-                    $modifiedCurrent[$key] = $key.': '.$this->typeFabric->transform($rule);
-                } else {
-                    $modifiedCurrent[$key] .= '; '.$this->typeFabric->transform($rule);
-                }
-            }
-        }
-
-        $modifiedMain = [];
-        foreach ($main as $key => $value) {
-            foreach ($value as $rule) {
-                if (! isset($modifiedMain[$key])) {
-                    $modifiedMain[$key] = $key.': '.$this->typeFabric->transform($rule);
-                } else {
-                    $modifiedMain[$key] .= '; '.$this->typeFabric->transform($rule);
-                }
-            }
-        }
+        $modifiedCurrent = $this->formatRules($current);
+        $modifiedMain = $this->formatRules($main);
 
         $commonKeys = array_intersect_key($modifiedCurrent, $modifiedMain);
 
@@ -110,26 +114,15 @@ class RequestService
         ];
     }
 
-    public function compareByKeys(array $modifiedCurrent, array $modifiedMain): ?string
+    protected function formatRules(array $rules): array
     {
-        $added = array_diff_key($modifiedCurrent, $modifiedMain);
-        $removed = array_diff_key($modifiedMain, $modifiedCurrent);
+        $result = [];
 
-        $format = function (string $key, array $fields) {
-            $fields = $fields ? __f(markdown: MarkdownSupport::CODE, text: implode(', ', array_keys($fields))) : null;
+        foreach ($rules as $key => $items) {
+            $transformed = array_map(fn($rule) => $this->typeFabric->transform($rule), $items);
+            $result[$key] = $key . ': ' . implode('; ', $transformed);
+        }
 
-            return $fields
-                ? __m(key: "analyze-endpoints::$key",
-                    replace: ['fields' => $fields],
-                    locale: $this->localization
-                ) : null;
-        };
-
-        $messages = array_filter([
-            $format('field_added', $added),
-            $format('field_removed', $removed),
-        ]);
-
-        return $messages ? implode('; ', $messages) : null;
+        return $result;
     }
 }
