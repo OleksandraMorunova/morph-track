@@ -30,5 +30,6 @@ abstract class CoreDump extends Command
     }
 
     abstract protected function subclass(): string;
+
     abstract protected function process(string $class): void;
 }
