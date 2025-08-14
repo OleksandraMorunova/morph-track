@@ -96,7 +96,7 @@ class ProcessUsagesRoutes implements PipelineStepContract
 
         if ($serverConfig) {
             $this->scrambleServerUri = collect($scrambleServer)
-                ->firstWhere('description', $serverConfig)['url'] ?? $scrambleServer[0];
+                ->firstWhere('description', $serverConfig)['url'] ?? $scrambleServer[0]['url'];
         } else {
             $this->scrambleServerUri = $scrambleServer[0];
         }
