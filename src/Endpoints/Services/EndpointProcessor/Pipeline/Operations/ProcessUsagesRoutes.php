@@ -32,11 +32,16 @@ class ProcessUsagesRoutes implements PipelineStepContract
         $routes = RouteFacade::getRoutes();
         foreach ($routes as $route) {
             $action = $route->getActionName();
-            if ($action === 'Closure' || ! Str::contains($action, '@')) {
+            if ($action === 'Closure') {
                 continue;
             }
 
-            [$controller, $method] = explode('@', $action);
+            [$controller, $method] = Str::contains($action, '@') ?
+                explode('@', $action) :
+                [
+                    $action,
+                    '__invoke'
+                ];
             $this->fillUsageEntry($details, $route, $controller, $method);
         }
 
