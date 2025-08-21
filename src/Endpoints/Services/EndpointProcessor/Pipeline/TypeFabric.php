@@ -4,6 +4,7 @@ namespace OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline;
 
 use InvalidArgumentException;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\Type\Types\ArrayType;
+use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\Type\Types\BooleanType;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\Type\Types\NumberType;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\Type\Types\ObjectType;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\Type\Types\StringType;
@@ -17,6 +18,8 @@ class TypeFabric
             $class = StringType::class;
         } elseif (is_numeric($rule)) {
             $class = NumberType::class;
+        } elseif (is_bool($rule)) {
+            $class = BooleanType::class;
         } elseif (is_array($rule)) {
             $class = ArrayType::class;
         } elseif (is_object($rule)) {
