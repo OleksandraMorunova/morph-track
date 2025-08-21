@@ -40,7 +40,7 @@ class ProcessUsagesRoutes implements PipelineStepContract
                 explode('@', $action) :
                 [
                     $action,
-                    '__invoke'
+                    '__invoke',
                 ];
             $this->fillUsageEntry($details, $route, $controller, $method);
         }
