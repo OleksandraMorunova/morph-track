@@ -119,6 +119,9 @@ class RequestService
         $result = [];
 
         foreach ($rules as $key => $items) {
+            if(!is_array($items)) {
+                $items = [$items];
+            }
             $transformed = array_map(fn ($rule) => $this->typeFabric->transform($rule), $items);
             $result[$key] = $key.': '.implode('; ', $transformed);
         }
