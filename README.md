@@ -12,7 +12,7 @@ composer require om/morph-track
 ```
 - Vendor Publish
 ```bash 
-php artisan vendor:publish --tag=endpoints_config
+php artisan vendor:publish --tag=morph_track_config
 ```
 - Commands
 ```bash 
