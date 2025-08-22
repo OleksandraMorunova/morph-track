@@ -44,5 +44,5 @@ Use route_pipelines.post_filtered. to apply custom filters or transformations af
 
 ### 🔍 Scramble Dedoc Support
 - Supports generating OpenAPI specifications using [Scramble](https://github.com/dedoc/scramble).
-- Simply enable it wherever you define your morph_track_config.php (e.g., in `scramble.use`).
-You can configure server-specific OpenAPI documentation using `scramble.server`. The key you pass must match one of the server keys defined in your `scramble.php` config under the servers array.
+- Simply enable it wherever you define your morph_track_config.php (e.g., in `docs_support.scramble.use`).
+You can configure server-specific OpenAPI documentation using `docs_support.scramble.server`. The key you pass must match one of the server keys defined in your `scramble.php` config under the servers array.

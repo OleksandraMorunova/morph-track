@@ -26,9 +26,11 @@ return [
             ],
         ],
     ],
-    'scramble' => [
-        'use' => false,
-        'server' => 'dev',
+    'docs_support' => [
+        'scramble' => [
+            'use' => false,
+            'server' => 'dev',
+        ],
     ],
     'markdown_formatted' => true,
 ];
