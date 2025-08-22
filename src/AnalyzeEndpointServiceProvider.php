@@ -34,8 +34,8 @@ class AnalyzeEndpointServiceProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(GlobalConfig::class, fn () => new GlobalConfig());
-        $this->app->singleton(EndpointsConfig::class, fn () => new EndpointsConfig());
+        $this->app->singleton(GlobalConfig::class, fn () => new GlobalConfig);
+        $this->app->singleton(EndpointsConfig::class, fn () => new EndpointsConfig);
 
         require_once __DIR__.'/Helpers.php';
 
