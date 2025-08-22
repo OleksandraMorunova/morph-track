@@ -5,6 +5,7 @@ namespace OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Operations
 use Closure;
 use OM\MorphTrack\Endpoints\Contracts\PipelineStepContract;
 use OM\MorphTrack\Endpoints\Dto\Configuration\EndpointsConfig;
+use OM\MorphTrack\Endpoints\Services\DocsSupport\Scramble\ScrambleHelper;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\EndpointProcessorHelper;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\EndpointPipelineContext;
 
@@ -12,16 +13,19 @@ class FilterUnchanged implements PipelineStepContract
 {
     protected string $localization = 'en';
 
+    public function __construct(protected ScrambleHelper $scrambleHelper) {}
+
     public function handle(EndpointPipelineContext $context, Closure $next): EndpointPipelineContext
     {
         $config = $context->getConfig();
         $this->localization = $config->globalConfig->localization;
+        $this->scrambleHelper->config = $config;
 
         $details = $context->getFiles();
         $output = [];
 
         foreach ($details as $entry) {
-            $this->formatOutput($config, $entry, $output);
+            $this->formatOutput($entry, $output);
         }
 
         $filtered = $this->formatFinalOutput($output, $context->getConfig()->includeNs);
@@ -30,14 +34,14 @@ class FilterUnchanged implements PipelineStepContract
         return $next($context);
     }
 
-    protected function formatOutput(EndpointsConfig $config, array $entry, array &$output): void
+    protected function formatOutput(array $entry, array &$output): void
     {
         if (empty($entry['usedIn'])) {
             return;
         }
 
         foreach ($entry['usedIn'] as $usage) {
-            $routeKey = $this->formatHeader($config, $usage);
+            $routeKey = $this->formatHeader($usage);
 
             if (! isset($output[$routeKey])) {
                 $output[$routeKey] = [];
@@ -52,18 +56,12 @@ class FilterUnchanged implements PipelineStepContract
         }
     }
 
-    protected function formatHeader(EndpointsConfig $config, array $usage): string
+    protected function formatHeader(array $usage): string
     {
         $uri = $usage['uri'];
 
-        if ($config->globalConfig->markdownFormatted && $config->useScramble) {
-            $summary = $usage['summary'];
-            if (! $summary) {
-                $parts = explode('/', $uri);
-                $summary = end($parts);
-            }
-
-            return "{$usage['method']} [$summary]($uri)";
+        if($scrambleHeader = $this->scrambleHelper->formatHeader($usage, $uri)) {
+            return $scrambleHeader;
         }
 
         return "{$usage['method']} $uri";
