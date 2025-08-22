@@ -1,12 +1,13 @@
 <?php
 
 return [
+    'working_dir' => '/var/www/html',
     'route_pipelines' => [
         'post_filtered' => [],
     ],
     'field_change_locale' => 'uk',
     'pretty_print' => [
-        'used' => 'flat_verbose',
+        'used' => 'group_by_prefix',
         'types' => [
             'group_by_prefix' => [
                 'default_route_prefix' => '[APP]',
@@ -26,8 +27,8 @@ return [
         ],
     ],
     'scramble' => [
-        'use' => true,
-        'server' => 'Dev',
+        'use' => false,
+        'server' => 'dev',
     ],
     'markdown_formatted' => true,
 ];

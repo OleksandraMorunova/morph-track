@@ -2,6 +2,7 @@
 
 namespace OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline;
 
+use OM\MorphTrack\Core\Facades\GlobalConfigFacade;
 use RuntimeException;
 use Symfony\Component\Process\Process;
 
@@ -9,14 +10,13 @@ class GitHelper
 {
     public const BASE_PROJECT_PATH = '/tmp/morph-track_';
 
-    public const REPO_PATH = '/var/www/html';
-
     public static function getRulesFromDocker(string $namespace, string $branch = 'main'): array
     {
+        $workDir = GlobalConfigFacade::instance()->workingDir;
         $tmpDir = self::BASE_PROJECT_PATH.$branch;
 
         if (! is_dir($tmpDir)) {
-            self::createProject($branch, $tmpDir);
+            self::createProject($workDir, $branch, $tmpDir);
         }
 
         try {
@@ -45,23 +45,23 @@ class GitHelper
 
             return json_decode($process->getOutput(), true) ?: [];
         } catch (\Throwable $e) {
-            self::dropProject($tmpDir, $branch);
+            self::dropProject($workDir, $tmpDir, $branch);
             throw new RuntimeException($e->getMessage(), 0, $e);
         }
     }
 
-    public static function dropProject(string $tmpDir, string $branch = 'main'): void
+    public static function dropProject(string $workDir, string $tmpDir, string $branch = 'main'): void
     {
-        $rmWorktree = new Process(['git', 'worktree', 'remove', '--force', $tmpDir], self::REPO_PATH);
+        $rmWorktree = new Process(['git', 'worktree', 'remove', '--force', $tmpDir], $workDir);
         $rmWorktree->run();
         if (! $rmWorktree->isSuccessful()) {
             throw new RuntimeException("Failed to drop worktree for '{$branch}': ".$rmWorktree->getErrorOutput());
         }
     }
 
-    protected static function createProject(string $branch, string $tmpDir): void
+    protected static function createProject(string $workDir, string $branch, string $tmpDir): void
     {
-        $repoPath = self::REPO_PATH;
+        $repoPath = $workDir;
         $commitHash = (new Process(['git', 'rev-parse', $branch], $repoPath))->mustRun()->getOutput();
         (new Process(['git', 'worktree', 'prune'], $repoPath))->run();
         (new Process(['git', 'worktree', 'add', $tmpDir, trim($commitHash)], $repoPath))
