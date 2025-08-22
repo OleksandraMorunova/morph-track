@@ -9,7 +9,9 @@ use OM\MorphTrack\Endpoints\Dto\Configuration\EndpointsConfig;
 class ScrambleHelper
 {
     public EndpointsConfig $config;
+
     protected ?array $openApiPaths = null;
+
     protected ?string $scrambleServerUri = null;
 
     public function scrambleSupport(): void
@@ -73,7 +75,7 @@ class ScrambleHelper
     public function formatHeader(array $usage, string $uri): ?string
     {
         if (! $this->config->globalConfig->markdownFormatted || ! $this->config->useScramble) {
-           return null;
+            return null;
         }
 
         $summary = $usage['summary'];

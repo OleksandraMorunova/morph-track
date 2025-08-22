@@ -4,7 +4,6 @@ namespace OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Operations
 
 use Closure;
 use OM\MorphTrack\Endpoints\Contracts\PipelineStepContract;
-use OM\MorphTrack\Endpoints\Dto\Configuration\EndpointsConfig;
 use OM\MorphTrack\Endpoints\Services\DocsSupport\Scramble\ScrambleHelper;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\EndpointProcessorHelper;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\EndpointPipelineContext;
@@ -60,7 +59,7 @@ class FilterUnchanged implements PipelineStepContract
     {
         $uri = $usage['uri'];
 
-        if($scrambleHeader = $this->scrambleHelper->formatHeader($usage, $uri)) {
+        if ($scrambleHeader = $this->scrambleHelper->formatHeader($usage, $uri)) {
             return $scrambleHeader;
         }
 
