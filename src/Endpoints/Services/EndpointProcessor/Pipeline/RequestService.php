@@ -3,6 +3,7 @@
 namespace OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline;
 
 use OM\MorphTrack\MarkdownSupport;
+use Throwable;
 
 class RequestService
 {
@@ -18,7 +19,12 @@ class RequestService
     {
         $this->namespace = $namespace;
 
-        return (new $namespace)->rules();
+        try {
+            return (new $namespace)->rules();
+        } catch (Throwable $e) {
+            echo "⚠️ Error in $namespace::rules(): {$e->getMessage()}\n";
+        }
+        return [];
     }
 
     public function compareRules(array $current, array $main, string $localization): ?string
