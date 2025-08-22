@@ -5,6 +5,7 @@ namespace OM\MorphTrack;
 class DocsConfig
 {
     public bool|string $useDocs;
+
     public ?string $swaggerApiFileUrl;
 
     public function __construct(public bool $includeNs = false)

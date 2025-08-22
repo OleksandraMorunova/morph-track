@@ -6,6 +6,7 @@ use Illuminate\Routing\Route;
 use OM\MorphTrack\Core\Service\DocsSupport\DocsHelper;
 use RuntimeException;
 use Symfony\Component\Yaml\Yaml;
+
 use function array_pop;
 use function count;
 use function dirname;
@@ -21,8 +22,11 @@ use function strtolower;
 class SwaggerHelper extends DocsHelper
 {
     protected string $apiFileUrl;
+
     protected string $baseDir;
+
     protected array $yaml;
+
     protected ?string $serverUri = null;
 
     public function prepare(): void
@@ -39,12 +43,12 @@ class SwaggerHelper extends DocsHelper
         $uri = preg_replace('#^api#', '', $route->uri());
         [$tag, $summary] = $this->getTags($uri, $method);
 
-
         $lowerMethod = strtolower($method);
 
         $path = $this->pathToJsonPointer($uri);
 
         $uri = $this->serverUri."#$tag/$lowerMethod"."_$path";
+
         return [$uri, $summary];
     }
 
@@ -71,7 +75,7 @@ class SwaggerHelper extends DocsHelper
 
     protected function resolveNode(mixed $node, string $baseDir): mixed
     {
-        if (!is_array($node)) {
+        if (! is_array($node)) {
             return $node;
         }
 
@@ -99,13 +103,13 @@ class SwaggerHelper extends DocsHelper
     {
         $parts = explode('#', $ref, 2);
         $filePart = $parts[0] ?? '';
-        $pointer  = $parts[1] ?? '';
+        $pointer = $parts[1] ?? '';
 
         if ($filePart === '' || $filePart === null) {
             $doc = $this->loadYaml($this->apiFileUrl);
             $currentBase = dirname($this->apiFileUrl);
         } else {
-            $filePath = $this->normalizePath($baseDir . DIRECTORY_SEPARATOR . $filePart);
+            $filePath = $this->normalizePath($baseDir.DIRECTORY_SEPARATOR.$filePart);
             $doc = $this->loadYaml($filePath);
             $currentBase = dirname($filePath);
         }
@@ -127,7 +131,7 @@ class SwaggerHelper extends DocsHelper
 
         foreach ($segments as $seg) {
             $seg = str_replace(['~1', '~0'], ['/', '~'], $seg);
-            if (!is_array($cur) || !\array_key_exists($seg, $cur)) {
+            if (! is_array($cur) || ! \array_key_exists($seg, $cur)) {
                 throw new RuntimeException("The specified JSON Pointer was not found: /$pointer");
             }
             $cur = $cur[$seg];
@@ -138,9 +142,10 @@ class SwaggerHelper extends DocsHelper
 
     protected function loadYaml(string $path): array
     {
-        if (!is_file($path)) {
+        if (! is_file($path)) {
             throw new RuntimeException("File not found: $path");
         }
+
         return Yaml::parseFile($path);
     }
 
@@ -148,18 +153,26 @@ class SwaggerHelper extends DocsHelper
     {
         $parts = [];
         foreach (explode(DIRECTORY_SEPARATOR, $path) as $part) {
-            if ($part === '' || $part === '.') continue;
-            if ($part === '..') { array_pop($parts); continue; }
+            if ($part === '' || $part === '.') {
+                continue;
+            }
+            if ($part === '..') {
+                array_pop($parts);
+
+                continue;
+            }
             $parts[] = $part;
         }
         $prefix = str_starts_with($path, DIRECTORY_SEPARATOR) ? DIRECTORY_SEPARATOR : '';
-        return $prefix . implode(DIRECTORY_SEPARATOR, $parts);
+
+        return $prefix.implode(DIRECTORY_SEPARATOR, $parts);
     }
 
     protected function pathToJsonPointer(string $path): string
     {
         $path = trim($path, '/');
-        return  str_replace(
+
+        return str_replace(
             ['-', '/', '{', '}'],
             ['_', '_', '__', '__'],
             $path

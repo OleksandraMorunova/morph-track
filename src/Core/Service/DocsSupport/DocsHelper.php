@@ -10,6 +10,7 @@ abstract class DocsHelper
     public EndpointsConfig $config;
 
     abstract public function prepare(): void;
+
     abstract public function buildUri(Route $route, string $method): array;
 
     public function formatHeader(array $usage, string $uri): ?string

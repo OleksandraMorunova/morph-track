@@ -8,8 +8,11 @@ use OM\MorphTrack\GlobalConfig;
 class EndpointsConfig
 {
     public array $postFiltering = [];
+
     public string $prettyPrintUsed;
+
     public array $prettyPrintTypes;
+
     public GlobalConfig $globalConfig;
 
     public function __construct(public bool $includeNs = false)

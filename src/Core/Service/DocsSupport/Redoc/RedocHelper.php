@@ -33,10 +33,10 @@ class RedocHelper extends SwaggerHelper
         return [$uri, $summary];
     }
 
-
     protected function pathToJsonPointer(string $path): string
     {
         $path = str_replace('~', '~0', $path);
+
         return str_replace('/', '~1', $path);
     }
 }

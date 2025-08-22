@@ -39,7 +39,6 @@ class AnalyzeEndpointServiceProvider extends ServiceProvider
         $this->app->singleton(GlobalConfig::class, fn () => new GlobalConfig);
         $this->app->singleton(EndpointsConfig::class, fn () => new EndpointsConfig);
 
-
         $this->app->bind(DocsHelper::class, function ($app) {
             /** @var DocsSupportFabric $fabric */
             $fabric = $app->make(DocsSupportFabric::class);
