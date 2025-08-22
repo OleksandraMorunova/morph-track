@@ -4,6 +4,8 @@ namespace OM\MorphTrack;
 
 use Illuminate\Foundation\Application as LaravelApplication;
 use Illuminate\Support\ServiceProvider;
+use OM\MorphTrack\Core\Service\DocsSupport\DocsHelper;
+use OM\MorphTrack\Core\Service\DocsSupport\DocsSupportFabric;
 use OM\MorphTrack\Endpoints\Console\Command\AnalyzeEndpointCommand;
 use OM\MorphTrack\Endpoints\Console\Command\Dev\DumpRequest;
 use OM\MorphTrack\Endpoints\Console\Command\DropWorktree;
@@ -36,6 +38,14 @@ class AnalyzeEndpointServiceProvider extends ServiceProvider
 
         $this->app->singleton(GlobalConfig::class, fn () => new GlobalConfig);
         $this->app->singleton(EndpointsConfig::class, fn () => new EndpointsConfig);
+
+
+        $this->app->bind(DocsHelper::class, function ($app) {
+            /** @var DocsSupportFabric $fabric */
+            $fabric = $app->make(DocsSupportFabric::class);
+
+            return $fabric->make();
+        });
 
         require_once __DIR__.'/Helpers.php';
 

@@ -27,9 +27,16 @@ return [
         ],
     ],
     'docs_support' => [
+        'use' => false,
         'scramble' => [
-            'use' => false,
             'server' => 'dev',
+        ],
+        'swagger' => [
+            'api_url' => 'resources/docs/api/api.yaml',
+            'server_url' => 'http://localhost',
+        ],
+        'redoc' => [
+            'server_url' => 'http://localhost',
         ],
     ],
     'markdown_formatted' => true,

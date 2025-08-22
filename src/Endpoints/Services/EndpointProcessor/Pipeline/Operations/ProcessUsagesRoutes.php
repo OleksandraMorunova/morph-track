@@ -5,26 +5,25 @@ namespace OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Operations
 use Closure;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Str;
-use OM\MorphTrack\Core\Service\DocsSupport\Scramble\ScrambleHelper;
+use OM\MorphTrack\Core\Service\DocsSupport\DocsHelper;
 use OM\MorphTrack\Endpoints\Contracts\PipelineStepContract;
 use OM\MorphTrack\Endpoints\Dto\Configuration\EndpointsConfig;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\EndpointPipelineContext;
+use ReflectionException;
 
 class ProcessUsagesRoutes implements PipelineStepContract
 {
     protected EndpointsConfig $config;
 
-    public function __construct(protected ScrambleHelper $scrambleHelper) {}
+    public function __construct(protected ?DocsHelper $docsHelper) {}
 
     /**
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function handle(EndpointPipelineContext $context, Closure $next): EndpointPipelineContext
     {
         $this->config = $context->getConfig();
-        $this->scrambleHelper->config = $this->config;
-
-        $this->scrambleHelper->scrambleSupport();
+        $this->docsHelper->prepare();
 
         $details = $context->getFiles();
 
@@ -50,7 +49,7 @@ class ProcessUsagesRoutes implements PipelineStepContract
     }
 
     /**
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     protected function fillUsageEntry(array &$details, $route, string $controller, string $methodName): void
     {
@@ -67,7 +66,7 @@ class ProcessUsagesRoutes implements PipelineStepContract
             ) {
                 $method = $route->methods()[0];
 
-                [$newUri, $summary] = $this->scrambleHelper->scrambleBuildUri($route, $method);
+                [$newUri, $summary] = $this->docsHelper->buildUri($route, $method);
                 $entry['usedIn'][] = [
                     'method' => $method,
                     'original_uri' => $route->uri,
