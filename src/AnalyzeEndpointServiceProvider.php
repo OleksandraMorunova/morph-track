@@ -5,6 +5,7 @@ namespace OM\MorphTrack;
 use Illuminate\Foundation\Application as LaravelApplication;
 use Illuminate\Support\ServiceProvider;
 use OM\MorphTrack\Endpoints\Console\Command\AnalyzeEndpointCommand;
+use OM\MorphTrack\Endpoints\Console\Command\Dev\DumpRequest;
 use OM\MorphTrack\Endpoints\Console\Command\DropWorktree;
 use OM\MorphTrack\Endpoints\Console\Command\ListWorktrees;
 use OM\MorphTrack\Instructions\Console\Command\GenerateInstructionCommand;
@@ -19,6 +20,7 @@ class AnalyzeEndpointServiceProvider extends ServiceProvider
             GenerateInstructionCommand::class,
             ListWorktrees::class,
             DropWorktree::class,
+            DumpRequest::class,
         ]);
 
         $this->app->singleton('markdown-translator', function ($app) {
