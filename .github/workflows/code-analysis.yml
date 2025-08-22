@@ -36,6 +36,7 @@ jobs:
       - run: composer require laravel/pint --no-update --no-scripts
       - run: composer update laravel/pint --no-progress --no-scripts
       - run: vendor/bin/pint --verbose
+      - run: composer remove laravel/pint --no-progress --no-scripts
 
       - name: Check pint changes
         run: |
