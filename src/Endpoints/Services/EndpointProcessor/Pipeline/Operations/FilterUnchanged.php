@@ -59,7 +59,7 @@ class FilterUnchanged implements PipelineStepContract
     {
         $uri = $usage['uri'];
 
-        if($scrambleHeader = $this->scrambleHelper->formatHeader($usage, $uri)) {
+        if ($scrambleHeader = $this->scrambleHelper->formatHeader($usage, $uri)) {
             return $scrambleHeader;
         }
 
