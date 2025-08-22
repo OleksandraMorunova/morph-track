@@ -24,6 +24,7 @@ class RequestService
         } catch (Throwable $e) {
             echo "⚠️ Error in $namespace::rules(): {$e->getMessage()}\n";
         }
+
         return [];
     }
 
