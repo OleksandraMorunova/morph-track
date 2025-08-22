@@ -5,9 +5,9 @@ namespace OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Operations
 use Closure;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Str;
+use OM\MorphTrack\Core\Service\DocsSupport\Scramble\ScrambleHelper;
 use OM\MorphTrack\Endpoints\Contracts\PipelineStepContract;
 use OM\MorphTrack\Endpoints\Dto\Configuration\EndpointsConfig;
-use OM\MorphTrack\Endpoints\Services\DocsSupport\Scramble\ScrambleHelper;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\EndpointPipelineContext;
 
 class ProcessUsagesRoutes implements PipelineStepContract

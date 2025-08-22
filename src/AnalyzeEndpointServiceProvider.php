@@ -8,6 +8,7 @@ use OM\MorphTrack\Endpoints\Console\Command\AnalyzeEndpointCommand;
 use OM\MorphTrack\Endpoints\Console\Command\Dev\DumpRequest;
 use OM\MorphTrack\Endpoints\Console\Command\DropWorktree;
 use OM\MorphTrack\Endpoints\Console\Command\ListWorktrees;
+use OM\MorphTrack\Endpoints\Dto\Configuration\EndpointsConfig;
 use OM\MorphTrack\Instructions\Console\Command\GenerateInstructionCommand;
 use OM\MorphTrack\MarkdownTranslator\MarkdownTranslator;
 
@@ -33,6 +34,9 @@ class AnalyzeEndpointServiceProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(GlobalConfig::class, fn () => new GlobalConfig());
+        $this->app->singleton(EndpointsConfig::class, fn () => new EndpointsConfig());
+
         require_once __DIR__.'/Helpers.php';
 
         $this->mergeConfigFrom(
@@ -51,5 +55,10 @@ class AnalyzeEndpointServiceProvider extends ServiceProvider
 
             $this->loadJsonTranslationsFrom(__DIR__.'/../resources/lang');
         }
+    }
+
+    public function provides(): array
+    {
+        return [EndpointsConfig::class];
     }
 }

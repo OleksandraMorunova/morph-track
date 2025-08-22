@@ -1,6 +1,6 @@
 <?php
 
-namespace OM\MorphTrack\Endpoints\Services\DocsSupport\Scramble;
+namespace OM\MorphTrack\Core\Service\DocsSupport\Scramble;
 
 use Illuminate\Routing\Route;
 use Illuminate\Support\Str;
