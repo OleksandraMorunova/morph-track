@@ -3,21 +3,18 @@
 namespace OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Operations;
 
 use Closure;
-use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Str;
 use OM\MorphTrack\Endpoints\Contracts\PipelineStepContract;
 use OM\MorphTrack\Endpoints\Dto\Configuration\EndpointsConfig;
+use OM\MorphTrack\Endpoints\Services\DocsSupport\Scramble\ScrambleHelper;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\EndpointPipelineContext;
-use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\ScrambleWrapper;
 
 class ProcessUsagesRoutes implements PipelineStepContract
 {
-    protected ?array $openApiPaths = null;
-
-    protected ?string $scrambleServerUri = null;
-
     protected EndpointsConfig $config;
+
+    public function __construct(protected ScrambleHelper $scrambleHelper) {}
 
     /**
      * @throws \ReflectionException
@@ -25,7 +22,9 @@ class ProcessUsagesRoutes implements PipelineStepContract
     public function handle(EndpointPipelineContext $context, Closure $next): EndpointPipelineContext
     {
         $this->config = $context->getConfig();
-        $this->scrambleSupport();
+        $this->scrambleHelper->config = $this->config;
+
+        $this->scrambleHelper->scrambleSupport();
 
         $details = $context->getFiles();
 
@@ -50,19 +49,6 @@ class ProcessUsagesRoutes implements PipelineStepContract
         return $next($context);
     }
 
-    protected function scrambleSupport(): void
-    {
-        $generator = ScrambleWrapper::get();
-
-        if (! $this->config->useScramble || ! is_array($generator)) {
-            return;
-        }
-
-        $this->scrambleServerBuildUri($generator);
-
-        $this->openApiPaths = $generator['paths'] ?? null;
-    }
-
     /**
      * @throws \ReflectionException
      */
@@ -81,7 +67,7 @@ class ProcessUsagesRoutes implements PipelineStepContract
             ) {
                 $method = $route->methods()[0];
 
-                [$newUri, $summary] = $this->scrambleBuildUri($route, $method);
+                [$newUri, $summary] = $this->scrambleHelper->scrambleBuildUri($route, $method);
                 $entry['usedIn'][] = [
                     'method' => $method,
                     'original_uri' => $route->uri,
@@ -92,50 +78,5 @@ class ProcessUsagesRoutes implements PipelineStepContract
                 ];
             }
         }
-    }
-
-    protected function scrambleServerBuildUri(array $generator): void
-    {
-        $serverConfig = $this->config->scrambleServerConfig;
-        $scrambleServer = $generator['servers'];
-
-        if ($serverConfig) {
-            $this->scrambleServerUri = collect($scrambleServer)
-                ->firstWhere('description', $serverConfig)['url'] ?? $scrambleServer[0]['url'];
-        } else {
-            $this->scrambleServerUri = $scrambleServer[0];
-        }
-        $this->scrambleServerUri = preg_replace('#/api#', '', $this->scrambleServerUri);
-
-        $this->scrambleServerUri = "$this->scrambleServerUri/docs/api#/operations/";
-    }
-
-    protected function scrambleBuildUri(Route $route, string $method): array
-    {
-        $uri = $route->uri();
-
-        if (! $this->openApiPaths) {
-            return [$uri, null];
-        }
-
-        $method = strtolower($method);
-        $normalizedUri = preg_replace('#^api#', '', $uri);
-
-        $findMethod = $this->openApiPaths[$normalizedUri][$method] ?? null;
-        $operationId = $findMethod['operationId'] ?? null;
-
-        if (! $operationId) {
-            $normalizedUri = preg_replace_callback('/\{(\w+)\}/', fn ($matches) => '{'.Str::camel($matches[1]).'}', $normalizedUri);
-            $findMethod = $this->openApiPaths[$normalizedUri][$method] ?? null;
-            $operationId = $findMethod['operationId'] ?? null;
-        }
-
-        $newUri = $operationId
-            ? $this->scrambleServerUri.$operationId
-            : $this->scrambleServerUri.$uri;
-
-        $summary = $findMethod['summary'] ?? $findMethod['operationId'];
-
-        return [$newUri, $summary];
     }
 }

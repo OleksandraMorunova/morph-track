@@ -1,6 +1,6 @@
 <?php
 
-namespace OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline;
+namespace OM\MorphTrack\Endpoints\Services\DocsSupport\Scramble;
 
 class ScrambleWrapper
 {
