@@ -2,7 +2,6 @@
 
 namespace OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline;
 
-use OM\MorphTrack\Core\Facades\EndpointsConfigFacade;
 use OM\MorphTrack\Core\Facades\GlobalConfigFacade;
 use RuntimeException;
 use Symfony\Component\Process\Process;
