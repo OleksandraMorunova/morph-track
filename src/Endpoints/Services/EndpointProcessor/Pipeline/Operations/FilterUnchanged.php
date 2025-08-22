@@ -3,7 +3,7 @@
 namespace OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Operations;
 
 use Closure;
-use OM\MorphTrack\Core\Service\DocsSupport\Scramble\ScrambleHelper;
+use OM\MorphTrack\Core\Service\DocsSupport\DocsHelper;
 use OM\MorphTrack\Endpoints\Contracts\PipelineStepContract;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\EndpointProcessorHelper;
 use OM\MorphTrack\Endpoints\Services\EndpointProcessor\Pipeline\Dto\EndpointPipelineContext;
@@ -12,13 +12,12 @@ class FilterUnchanged implements PipelineStepContract
 {
     protected string $localization = 'en';
 
-    public function __construct(protected ScrambleHelper $scrambleHelper) {}
+    public function __construct(protected ?DocsHelper $docsHelper) {}
 
     public function handle(EndpointPipelineContext $context, Closure $next): EndpointPipelineContext
     {
         $config = $context->getConfig();
         $this->localization = $config->globalConfig->localization;
-        $this->scrambleHelper->config = $config;
 
         $details = $context->getFiles();
         $output = [];
@@ -59,7 +58,7 @@ class FilterUnchanged implements PipelineStepContract
     {
         $uri = $usage['uri'];
 
-        if ($scrambleHeader = $this->scrambleHelper->formatHeader($usage, $uri)) {
+        if ($scrambleHeader = $this->docsHelper->formatHeader($usage, $uri)) {
             return $scrambleHeader;
         }
 

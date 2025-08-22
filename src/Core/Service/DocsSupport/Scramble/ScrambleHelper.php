@@ -4,46 +4,28 @@ namespace OM\MorphTrack\Core\Service\DocsSupport\Scramble;
 
 use Illuminate\Routing\Route;
 use Illuminate\Support\Str;
-use OM\MorphTrack\Endpoints\Dto\Configuration\EndpointsConfig;
+use OM\MorphTrack\Core\Service\DocsSupport\DocsHelper;
 
-class ScrambleHelper
+class ScrambleHelper extends DocsHelper
 {
-    public EndpointsConfig $config;
-
     protected ?array $openApiPaths = null;
 
     protected ?string $scrambleServerUri = null;
 
-    public function scrambleSupport(): void
+    public function prepare(): void
     {
         $generator = ScrambleWrapper::get();
 
-        if (! $this->config->useScramble || ! is_array($generator)) {
+        if (! is_array($generator)) {
             return;
         }
 
-        $this->scrambleServerBuildUri($generator);
+        $this->serverBuildUri($generator);
 
         $this->openApiPaths = $generator['paths'] ?? null;
     }
 
-    public function scrambleServerBuildUri(array $generator): void
-    {
-        $serverConfig = $this->config->scrambleServerConfig;
-        $scrambleServer = $generator['servers'];
-
-        if ($serverConfig) {
-            $this->scrambleServerUri = collect($scrambleServer)
-                ->firstWhere('description', $serverConfig)['url'] ?? $scrambleServer[0]['url'];
-        } else {
-            $this->scrambleServerUri = $scrambleServer[0];
-        }
-        $this->scrambleServerUri = preg_replace('#/api#', '', $this->scrambleServerUri);
-
-        $this->scrambleServerUri = "$this->scrambleServerUri/docs/api#/operations/";
-    }
-
-    public function scrambleBuildUri(Route $route, string $method): array
+    public function buildUri(Route $route, string $method): array
     {
         $uri = $route->uri();
 
@@ -72,18 +54,20 @@ class ScrambleHelper
         return [$newUri, $summary];
     }
 
-    public function formatHeader(array $usage, string $uri): ?string
+    protected function serverBuildUri(array $generator): void
     {
-        if (! $this->config->globalConfig->markdownFormatted || ! $this->config->useScramble) {
-            return null;
-        }
+        $serverConfig = config('morph_track_config.docs_support.scramble.server', 'Live');
 
-        $summary = $usage['summary'];
-        if (! $summary) {
-            $parts = explode('/', $uri);
-            $summary = end($parts);
-        }
+        $scrambleServer = $generator['servers'];
 
-        return "{$usage['method']} [$summary]($uri)";
+        if ($serverConfig) {
+            $this->scrambleServerUri = collect($scrambleServer)
+                ->firstWhere('description', $serverConfig)['url'] ?? $scrambleServer[0]['url'];
+        } else {
+            $this->scrambleServerUri = $scrambleServer[0];
+        }
+        $this->scrambleServerUri = preg_replace('#/api#', '', $this->scrambleServerUri);
+
+        $this->scrambleServerUri = "$this->scrambleServerUri/docs/api#/operations/";
     }
 }

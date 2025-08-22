@@ -24,7 +24,8 @@
   ],
   "require": {
     "php": ">=8.0",
-    "laravel/framework": ">=9.0"
+    "laravel/framework": ">=9.0",
+    "symfony/yaml": "^6.4"
   },
   "autoload": {
     "psr-4": {
