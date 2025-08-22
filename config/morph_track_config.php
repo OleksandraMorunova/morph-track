@@ -27,7 +27,7 @@ return [
         ],
     ],
     'docs_support' => [
-        'use' => 'scramble',
+        'use' => false,
         'scramble' => [
             'server' => 'dev',
         ],
