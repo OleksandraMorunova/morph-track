@@ -5,7 +5,9 @@ namespace OM\MorphTrack;
 class GlobalConfig
 {
     public string $localization;
+
     public string $workingDir;
+
     public bool $markdownFormatted = true;
 
     public function __construct(public bool $includeNs = false)

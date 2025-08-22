@@ -21,8 +21,8 @@ class EndpointsConfig
     public function __construct(public bool $includeNs = false)
     {
         $this->postFiltering = config('morph_track_config.route_pipelines.post_filtered', []);
-        $this->useScramble = config('morph_track_config.scramble.use', false) && class_exists(\Dedoc\Scramble\Scramble::class);
-        $this->scrambleServerConfig = config('morph_track_config.scramble.server', 'Live');
+        $this->useScramble = config('morph_track_config.docs_support.scramble.use', false) && class_exists(\Dedoc\Scramble\Scramble::class);
+        $this->scrambleServerConfig = config('morph_track_config.docs_support.scramble.server', 'Live');
         $this->prettyPrintUsed = config('morph_track_config.pretty_print.used', 'flat_verbose');
         $this->prettyPrintTypes = config('morph_track_config.pretty_print.types', []);
         $this->globalConfig = new GlobalConfig;
