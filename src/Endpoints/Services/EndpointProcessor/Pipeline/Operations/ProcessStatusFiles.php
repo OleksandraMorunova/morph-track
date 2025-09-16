@@ -47,7 +47,6 @@ class ProcessStatusFiles implements PipelineStepContract
 
     protected function processDetails(string $file, EndpointParameters $params, array &$details): void
     {
-        $base = pathinfo($file, PATHINFO_FILENAME);
         $namespace = EndpointProcessorHelper::pathToNamespace($file);
 
         $status = EndpointProcessorHelper::gitFileStatus($params, $file);
@@ -58,7 +57,7 @@ class ProcessStatusFiles implements PipelineStepContract
             return;
         }
 
-        $details[$base] = [
+        $details[$namespace] = [
             'status' => $lineStatus,
             'namespace' => $namespace,
             'type' => $type,

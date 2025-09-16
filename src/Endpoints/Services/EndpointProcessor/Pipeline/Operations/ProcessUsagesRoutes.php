@@ -57,12 +57,14 @@ class ProcessUsagesRoutes implements PipelineStepContract
         $file = $rc->getFileName();
         $lines = file($file);
         $body = implode('', array_slice($lines, $rc->getStartLine() - 1, $rc->getEndLine() - $rc->getStartLine() + 1));
+        $fullFile = implode('', $lines);
 
         foreach ($details as $namespace => &$entry) {
             $class = class_basename($namespace);
+
             if (
-                preg_match('/\b'.preg_quote($class, '/').'\b/', $body) ||
-                preg_match('/\b'.preg_quote($namespace, '/').'\b/', $body)
+                preg_match('/\b'.preg_quote("use ".$namespace, '/').'\b/', $fullFile) &&
+                preg_match('/\b'.preg_quote($class, '/').'\b/', $body)
             ) {
                 $method = $route->methods()[0];
 
